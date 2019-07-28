@@ -1,8 +1,10 @@
 <template>
   <header class="header">
-    <h1>Header Title</h1>
+    <h1>The League</h1>
     <div id="nav">
       <router-link to="/">Home</router-link> |
+      <router-link to="/announcementsView">Announcements</router-link> |
+      <router-link to="/tableView">Table</router-link> |
       <router-link to="/about">About</router-link>
     </div>
   </header>

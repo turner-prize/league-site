@@ -4,6 +4,7 @@
     :collapsed="true"
     >
     <span slot="collapse-icon" class="fas fa-arrows-alt-h"></span>
+    <span slot="dropdown-icon" class="fas fa-angle-down"></span>
     </sidebar-menu >
 </template>
 
@@ -25,9 +26,24 @@ export default {
                 },
                 {
                     title:'Announcements',
-                    href: '/announcements',
-                    icon: 'fa fa-download'
-                }
+                    href: '/announcementsView',
+                    icon: 'far fa-comment-alt'
+                },
+                {
+                    title:'Table',
+                    href: '/tableView',
+                    icon: 'fas fa-table'
+                },
+                { // item with child
+                        title: 'Charts',
+                        icon: 'fa fa-chart-area',
+                        child: [
+                            {
+                                href: '/statsView',
+                                title: 'League Table over Time',
+                            }
+                        ]
+                    },
             ]
         }
     }

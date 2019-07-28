@@ -1,22 +1,15 @@
 <template>
-  <div id="announcementsView">
-    <Announcements v-on:send-announcement="sendAnnouncement" />
-    <Stats />
+  <div id="statsView">    <Stats />
   </div>
 </template>
 
 <script>
-import Announcements from '../components/Announcements.vue'
+import Stats from '../components/Stats.vue'
 
 export default {
   name: 'app',
   components: {
-    Announcements,
-  },
-  methods:{
-    sendAnnouncement(msg){
-      console.log(msg);
-    },
+    Stats
   },
   }
 </script>

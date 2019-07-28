@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+import AnnouncementsView from './views/AnnouncementsView.vue'
+import TableView from './views/TableView.vue'
+import StatsView from './views/StatsView.vue'
 
 Vue.use(Router)
 
@@ -10,6 +13,21 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/announcementsView',
+      name: 'announcementsView',
+      component: AnnouncementsView
+    },
+    {
+      path: '/tableView',
+      name: 'tableView',
+      component: TableView
+    },
+    {
+      path: '/statsView',
+      name: 'statsView',
+      component: StatsView
     },
     {
       path: '/about',
