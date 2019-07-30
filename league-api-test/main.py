@@ -39,7 +39,18 @@ class TableHistory(db.Model):
         self.gameweek = gameweek
         self.manager = manager
         self.position = position
+        
+class Players(db.Model):
+    __tablename__ = 'players'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(50))
+    team = db.Column(db.String(50))
+    position = db.Column(db.Integer)
     
+    def __init__(self,team,name,position):
+        self.team = team
+        self.name = name
+        self.position = position  
  
 class tableSchema(ma.Schema):
     class Meta:
@@ -49,11 +60,17 @@ class tableHistorySchema(ma.Schema):
     class Meta:
         fields = ('id','gameweek','manager','position')
 
+class playerschema(ma.Schema):
+    class Meta:
+        fields = ('id','team','name','position')
+        
 table_schema = tableSchema(strict=True)
 tables_schema = tableSchema(many=True, strict=True)
 table_history_schema = tableHistorySchema(strict=True)
 tables_history_schema = tableHistorySchema(many=True, strict=True)
-        
+player_schema = playerschema(strict=True)
+players_schema = playerschema(many=True, strict=True)
+    
 # endpoint to show all users
 @app.route('/table', methods=['GET'])
 def get_table():
@@ -61,6 +78,14 @@ def get_table():
   result = tables_schema.dump(all_products)
   return jsonify(result.data)
 
+# endpoint to show all users
+@app.route('/players', methods=['GET'])
+def get_players():
+  all_products = Players.query.all()
+  result = players_schema.dump(all_products)
+  return jsonify(result.data)
+
+  
 @app.route('/tablehistory', methods=['GET'])
 def get_table_history():
   all_products = TableHistory.query.all()

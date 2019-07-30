@@ -1,17 +1,20 @@
 <template>
   <div id="announcementsView">
     <Announcements v-on:send-announcement="sendAnnouncement" />
+    <Dropdowns />
     <Stats />
   </div>
 </template>
 
 <script>
 import Announcements from '../components/Announcements.vue'
+import Dropdowns from '../components/Dropdowns.vue'
 
 export default {
   name: 'app',
   components: {
     Announcements,
+    Dropdowns
   },
   methods:{
     sendAnnouncement(msg){
