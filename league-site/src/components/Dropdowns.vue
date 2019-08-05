@@ -44,7 +44,12 @@ export default {
 	},
 	methods:{
 		createLabel(option){
+			if (option.telegramid){
+			return `${option.name} - ${option.teamName}`
+			}
+			else{
 			return `${option.name} - ${option.first_name} ${option.second_name}`
+			}
 		},
 	},
 }

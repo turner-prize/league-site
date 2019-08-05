@@ -16,11 +16,6 @@ class Gameweeks(db.Model):
     gameweek_start = db.Column(db.String(50))
     gameweek_end = db.Column(db.String(50))
 
-
-class gameweekSchema(ma.Schema):
-    class Meta:
-        fields = ('id','name')
-
 class Players(db.Model):
     __tablename__ = 'players'
     jfpl = db.Column(db.Integer,primary_key=True)
@@ -40,11 +35,25 @@ class Players(db.Model):
     element_type = db.Column(db.Integer)
     team_details = db.relationship('PlTeams', backref='players')
     
+class Managers(db.Model):
+    __tablename__ = 'managers'
+    id = db.Column(db.Integer,primary_key=True)
+    telegramid = db.Column(db.Integer)
+    fplid = db.Column(db.Integer)
+    name = db.Column(db.String(50))
+    teamName = db.Column(db.String(50))
+    
 class PlTeams(db.Model):
     __tablename__ = 'plTeams'
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50))
     shortname = db.Column(db.Integer)
+
+#Schemas>
+
+class gameweekSchema(ma.Schema):
+    class Meta:
+        fields = ('id','name')
 
 class plTeamsSchema(ma.ModelSchema):
     class Meta:
@@ -55,3 +64,8 @@ class playerSchema(ma.ModelSchema):
     class Meta:
         model = Players
         fields = ('jfpl','first_name','second_name','element_type','shortname','name')
+        
+class managerSchema(ma.ModelSchema):
+    class Meta:
+        models = Managers
+        fields = ('id','telegramid','fplid','name','teamName')

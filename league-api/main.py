@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 
 from flask_cors import CORS
-from models import Gameweeks,gameweekSchema, db, ma, Players,playerSchema, PlTeams, plTeamsSchema
+from models import Gameweeks,gameweekSchema, db, ma, Players,playerSchema, PlTeams, plTeamsSchema, Managers, managerSchema
 import json
 import random
 import os
@@ -23,6 +23,7 @@ players_schema = playerSchema(many=True, strict=True)
 plTeam_schema = plTeamsSchema(strict=True)
 plTeams_schema = plTeamsSchema(many=True, strict=True)
 
+managers_schema = managerSchema(many=True, strict=True)
 
 # endpoint to show all users
 @app.route('/gameweeks', methods=['GET'])
@@ -30,6 +31,12 @@ def get_table():
   all_products = Gameweeks.query.filter_by(is_current='1').all()
   result = gameweeks_schema.dump(all_products)
   return jsonify(gw=result.data)
+  
+@app.route('/managers', methods=['GET'])
+def get_managers():
+  all_products = Managers.query.all()
+  result = managers_schema.dump(all_products)
+  return jsonify(result.data)
   
 @app.route('/players', methods=['GET'])
 def get_players():
