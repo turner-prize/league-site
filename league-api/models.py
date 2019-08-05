@@ -20,19 +20,38 @@ class Gameweeks(db.Model):
 class gameweekSchema(ma.Schema):
     class Meta:
         fields = ('id','name')
-        
-def populateGameweeks():
-    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
-    bootstrapData = r.json()
-    gameweekData = bootstrapData['events']
-    for i in gameweekData:
-        gw = Gameweeks( id=i['id'],
-                        name=i['name'],
-                        deadline=i['deadline_time'],
-                        is_current=i['is_current'],
-                        is_next=i['is_next'],
-                        gameweek_start='test',
-                        gameweek_end='test')
-        db.session.add(gw)
-        db.session.commit()
-    db.session.close()
+
+class Players(db.Model):
+    __tablename__ = 'players'
+    jfpl = db.Column(db.Integer,primary_key=True)
+    event_points = db.Column(db.Integer)
+    first_name = db.Column(db.String(50))
+    second_name = db.Column(db.String(50))
+    team = db.Column(db.Integer, db.ForeignKey('plTeams.id'))
+    team_code = db.Column(db.Integer)
+    goals_scored = db.Column(db.Integer)
+    assists = db.Column(db.Integer)
+    goals_conceded = db.Column(db.Integer)
+    pen_saved = db.Column(db.Integer)
+    pen_missed = db.Column(db.Integer)
+    yellow_cards = db.Column(db.Integer)
+    red_cards = db.Column(db.Integer)
+    saves = db.Column(db.Integer)
+    element_type = db.Column(db.Integer)
+    team_details = db.relationship('PlTeams', backref='players')
+    
+class PlTeams(db.Model):
+    __tablename__ = 'plTeams'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(50))
+    shortname = db.Column(db.Integer)
+
+class plTeamsSchema(ma.ModelSchema):
+    class Meta:
+        models = PlTeams
+        fields = ('id','name','shortname')
+
+class playerSchema(ma.ModelSchema):
+    class Meta:
+        model = Players
+        fields = ('first_name','second_name','element_type','shortname','name')

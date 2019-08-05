@@ -42,6 +42,7 @@ class Players(Base):
     yellow_cards = Column(Integer)
     red_cards = Column(Integer)
     saves = Column(Integer)
+    element_type = Column(Integer)
 
 class PlFixtures(Base):
     __tablename__ = 'plFixtures'
@@ -52,6 +53,12 @@ class PlFixtures(Base):
     home_team = Column(Integer)
     started = Column(String(50))
     finished = Column(String(50))
+
+class PlTeams(Base):
+    __tablename__ = 'plTeams'
+    id = Column(Integer,primary_key=True)
+    name = Column(String(50))
+    shortname = Column(Integer)
 
 def populateGameweeks():
     r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
@@ -89,7 +96,8 @@ def populatePlayers():
                         pen_missed = i['penalties_missed'],
                         yellow_cards = i['yellow_cards'],
                         red_cards = i['red_cards'],
-                        saves = i['saves'])
+                        saves = i['saves'],
+                        element_type = i['element_type'])
         session.add(plyr)
         session.commit()
     session.close()
@@ -107,6 +115,19 @@ def populatePlFixtures():
                             started = i['started'],
                             finished = i['finished'])
         session.add(fxtr)
+        session.commit()
+    session.close()
+
+def populatePlTeams():
+    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
+    bootstrapData = r.json()
+    plTeamsData = bootstrapData['teams']
+    session=CreateSession()
+    for i in plTeamsData:
+        tm = PlTeams(  id = i['id'],
+                            name = i['name'],
+                            shortname = i['short_name'])
+        session.add(tm)
         session.commit()
     session.close()
 

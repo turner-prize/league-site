@@ -1,29 +1,60 @@
 <template>
-        <select class="select-css">
-            <option v-for="player in myDropDown" :key="player.id"> 
-                {{ player.name }}{{player.id}}
-            </option>
-        </select>
+	<div>
+		<v-select 
+			:placeholder="this.positionName"
+			:get-option-label="createLabel" 
+			:options="this.playerList" 
+			:value="selection"
+			v-model="selection">
+		</v-select>
+	</div>
 </template>
 
 <script>
 import axios from 'axios'
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css';
 export default {
-    name:'Dropdowns',
-    data(){
-        return{
-            myDropDown: []
-        }
-    },
-    created() {
-      axios.get("http://127.0.0.1:5000/players")
-          .then(res => this.myDropDown = res.data)
-          .catch(err => console.log(err));
-    },
+	name:'Dropdowns',
+	components:{
+		vSelect
+	},
+	props:['playerList','positionName','playerValue'],
+	data() {
+		return {
+			selection: this.selected
+		}
+	},
+	watch: {
+		selection(val){
+			const p ={
+				//need to construct the object required (element type, name etc)
+					firstname:val.first_name,
+					team: val.name
+				}
+			this.$emit('update-player',p)
+		}
+	},
+	methods:{
+		createLabel(option){
+			return `${option.name} - ${option.first_name} ${option.second_name}`
+		},
+	},
 }
 </script>
 
 <style scoped>
+div{
+	display: flex;
+  	flex-direction: column;
+	margin: 0 auto;
+}
+
+.v-select{
+	width: 50%;
+	max-width: 50%;
+}
+
 .select-css {
 
 	padding: .6em 1.4em .5em .8em;

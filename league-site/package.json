@@ -18,6 +18,8 @@
     "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
     "vue-router": "^3.0.7",
+    "vue-search-select": "^2.8.3",
+    "vue-select": "^3.1.0",
     "vue-sidebar-menu": "^3.12.2",
     "vuetify": "^2.0.1"
   },
