@@ -16,7 +16,7 @@
         v-model="GK"
         positionName="Choose Goalkeeper">
         </Dropdowns>
-        {{GK}}
+        <!-- {{GK}} -->
         <br>
         <Dropdowns 
         :playerList="playerList.filter(c => c.element_type == 2)"
@@ -82,6 +82,7 @@ export default {
     },
     postPlayers(){
       const playerData = {
+          Manager:this.Manager,
           GK:this.GK,
           DF1:this.DF1,
           DF2:this.DF2,
@@ -89,6 +90,7 @@ export default {
           MF2:this.MF2,
           FWD:this.FWD
       }
+      console.log(playerData)
       axios.post("http://127.0.0.1:5000/sendplayers",playerData)
           .then(res => console.log(res))
           .catch(err => console.log(err));

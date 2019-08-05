@@ -27,15 +27,26 @@ export default {
 	watch: {
 		selection(val){
 			if (val) {
-				const p ={
+				if (val.telegramid){
+					const p ={
+					//need to construct the object required (element type, name etc)
+						teamId: val.id,
+						teamName:val.teamName,
+					}
+					console.log(p)
+					this.$emit("input", p);
+				}
+				else{
+					const p ={
 					//need to construct the object required (element type, name etc)
 						id: val.jfpl,
 						firstname:val.first_name,
 						lastname:val.second_name,
 						team: val.name
 					}
+					this.$emit("input", p);
+				}
 				//console.log(p)
-				this.$emit("input", p);
 			}
 			else{
 				this.$emit("input", {});
