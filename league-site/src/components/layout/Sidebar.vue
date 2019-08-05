@@ -34,6 +34,11 @@ export default {
                     href: '/tableView',
                     icon: 'fas fa-table'
                 },
+                {
+                    title:'Draft',
+                    href: '/draftView',
+                    icon: 'fas fa-award'
+                },
                 { // item with child
                         title: 'Charts',
                         icon: 'fa fa-chart-area',

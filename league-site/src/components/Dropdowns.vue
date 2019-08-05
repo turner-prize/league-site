@@ -4,7 +4,6 @@
 			:placeholder="this.positionName"
 			:get-option-label="createLabel" 
 			:options="this.playerList" 
-			:value="selection"
 			v-model="selection">
 		</v-select>
 	</div>
@@ -29,10 +28,13 @@ export default {
 		selection(val){
 			const p ={
 				//need to construct the object required (element type, name etc)
+					id: val.jfpl,
 					firstname:val.first_name,
+					lastname:val.second_name,
 					team: val.name
 				}
-			this.$emit('update-player',p)
+			//console.log(p)
+			this.$emit("input", p);
 		}
 	},
 	methods:{

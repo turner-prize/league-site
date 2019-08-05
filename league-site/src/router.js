@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import AnnouncementsView from './views/AnnouncementsView.vue'
 import TableView from './views/TableView.vue'
 import StatsView from './views/StatsView.vue'
+import DraftView from './views/DraftView.vue'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/statsView',
       name: 'statsView',
       component: StatsView
+    },
+    {
+      path: '/draftView',
+      name: 'draftView',
+      component: DraftView
     },
     {
       path: '/about',

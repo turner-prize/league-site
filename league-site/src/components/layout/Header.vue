@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <h1>The League</h1>
+    <h1>Test</h1> 
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/announcementsView">Announcements</router-link> |

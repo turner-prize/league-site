@@ -35,6 +35,7 @@ def get_table():
 def get_players():
   all_Players = Players.query.join(PlTeams) \
                 .add_columns(
+                              Players.jfpl,
                               Players.first_name,
                               Players.second_name,
                               Players.element_type,
@@ -46,7 +47,7 @@ def get_players():
 @app.route('/sendplayers', methods=['POST'])
 def recieve_players():
   if request.method == 'POST':
-    print(request.form)
+    print(request.get_json())
   return 'this worked'
 
 if __name__ == '__main__':

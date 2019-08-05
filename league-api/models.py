@@ -54,4 +54,4 @@ class plTeamsSchema(ma.ModelSchema):
 class playerSchema(ma.ModelSchema):
     class Meta:
         model = Players
-        fields = ('first_name','second_name','element_type','shortname','name')
+        fields = ('jfpl','first_name','second_name','element_type','shortname','name')
