@@ -33,6 +33,7 @@ class Players(db.Model):
     red_cards = db.Column(db.Integer)
     saves = db.Column(db.Integer)
     element_type = db.Column(db.Integer)
+    drafted = db.Column(db.Integer)
     team_details = db.relationship('PlTeams', backref='players')
     
 class Managers(db.Model):
@@ -49,6 +50,13 @@ class PlTeams(db.Model):
     name = db.Column(db.String(50))
     shortname = db.Column(db.Integer)
 
+class DraftedPlayers(db.Model):
+    __tablename__ = 'draftedPlayers'
+    id = db.Column(db.Integer,primary_key=True)
+    managerId = db.Column(db.Integer)
+    playerId = db.Column(db.Integer)
+
+
 #Schemas>
 
 class gameweekSchema(ma.Schema):
@@ -63,9 +71,14 @@ class plTeamsSchema(ma.ModelSchema):
 class playerSchema(ma.ModelSchema):
     class Meta:
         model = Players
-        fields = ('jfpl','first_name','second_name','element_type','shortname','name')
+        fields = ('jfpl','first_name','second_name','element_type','shortname','name','drafted')
         
 class managerSchema(ma.ModelSchema):
     class Meta:
         models = Managers
         fields = ('id','telegramid','fplid','name','teamName')
+
+class draftedPlayerSchema(ma.ModelSchema):
+    class Meta:
+        models = Managers
+        fields = ('id','managerId','playerId')

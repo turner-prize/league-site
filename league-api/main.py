@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 
 from flask_cors import CORS
-from models import Gameweeks,gameweekSchema, db, ma, Players,playerSchema, PlTeams, plTeamsSchema, Managers, managerSchema
+from models import Gameweeks,gameweekSchema, db, ma, Players,playerSchema, PlTeams, plTeamsSchema, Managers, managerSchema, DraftedPlayers, draftedPlayerSchema
 import json
 import random
 import os
@@ -14,15 +14,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 ma.init_app(app)
 
-gameweek_schema = gameweekSchema(strict=True)
 gameweeks_schema = gameweekSchema(many=True, strict=True)
-
-player_schema = playerSchema(strict=True)
 players_schema = playerSchema(many=True, strict=True)
-
-plTeam_schema = plTeamsSchema(strict=True)
 plTeams_schema = plTeamsSchema(many=True, strict=True)
-
 managers_schema = managerSchema(many=True, strict=True)
 
 # endpoint to show all users
@@ -46,16 +40,32 @@ def get_players():
                               Players.first_name,
                               Players.second_name,
                               Players.element_type,
+                              Players.drafted,
                               PlTeams.shortname,
-                              PlTeams.name).all()
+                              PlTeams.name).filter(Players.drafted==0).all()
   result = players_schema.dump(all_Players)
   return jsonify(result.data)
-    
-@app.route('/sendplayers', methods=['POST'])
+
+@app.route('/draftplayers', methods=['POST'])
 def recieve_players():
   if request.method == 'POST':
-    print(request.get_json())
+    response = request.get_json()
+    managerid = response['Manager']['teamId']
+    draftPlayers(managerid,response['GK']['id'])
+    draftPlayers(managerid,response['DF1']['id'])
+    draftPlayers(managerid,response['DF2']['id'])
+    draftPlayers(managerid,response['MF1']['id'])
+    draftPlayers(managerid,response['MF2']['id'])
+    draftPlayers(managerid,response['FWD']['id'])
   return 'this worked'
+
+def draftPlayers(managerid,playerid):
+    dp = DraftedPlayers(managerId=managerid,playerId=playerid)
+    db.session.add(dp)
+    player = Players.query.filter_by(jfpl=playerid).first()
+    player.drafted = 1
+    db.session.commit()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
