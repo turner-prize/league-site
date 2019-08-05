@@ -26,15 +26,20 @@ export default {
 	},
 	watch: {
 		selection(val){
-			const p ={
-				//need to construct the object required (element type, name etc)
-					id: val.jfpl,
-					firstname:val.first_name,
-					lastname:val.second_name,
-					team: val.name
-				}
-			//console.log(p)
-			this.$emit("input", p);
+			if (val) {
+				const p ={
+					//need to construct the object required (element type, name etc)
+						id: val.jfpl,
+						firstname:val.first_name,
+						lastname:val.second_name,
+						team: val.name
+					}
+				//console.log(p)
+				this.$emit("input", p);
+			}
+			else{
+				this.$emit("input", {});
+			}
 		}
 	},
 	methods:{
