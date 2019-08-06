@@ -3,7 +3,7 @@
 		<v-select 
 			:placeholder="this.positionName"
 			:get-option-label="createLabel" 
-			:options="this.playerList" 
+			:options="this.options" 
 			v-model="selection">
 		</v-select>
 	</div>
@@ -18,7 +18,7 @@ export default {
 	components:{
 		vSelect
 	},
-	props:['playerList','positionName','playerValue'],
+	props:['options','positionName','playerValue'],
 	data() {
 		return {
 			selection: this.selected
@@ -33,7 +33,7 @@ export default {
 						teamId: val.id,
 						teamName:val.teamName,
 					}
-					console.log(p)
+					//console.log(p)
 					this.$emit("input", p);
 				}
 				else{
@@ -51,7 +51,11 @@ export default {
 			else{
 				this.$emit("input", {});
 			}
-		}
+		},
+		// options (newdata){
+		// 	console.log('its here')
+		// 	console.log(newdata);
+		// }
 	},
 	methods:{
 		createLabel(option){

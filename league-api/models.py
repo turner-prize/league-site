@@ -43,6 +43,7 @@ class Managers(db.Model):
     fplid = db.Column(db.Integer)
     name = db.Column(db.String(50))
     teamName = db.Column(db.String(50))
+    draftPick = db.Column(db.Integer)
     
 class PlTeams(db.Model):
     __tablename__ = 'plTeams'
@@ -56,6 +57,17 @@ class DraftedPlayers(db.Model):
     managerId = db.Column(db.Integer)
     playerId = db.Column(db.Integer)
 
+class DraftBoard(db.Model):
+    __tablename__ = 'draftBoard'
+    id = db.Column(db.Integer,primary_key=True)
+    managerId = db.Column(db.Integer,db.ForeignKey('managers.id'))
+    GK = db.Column(db.String(50))
+    MF1 = db.Column(db.String(50))
+    MF2 = db.Column(db.String(50))
+    DF1 = db.Column(db.String(50))
+    DF2 = db.Column(db.String(50))
+    FWD = db.Column(db.String(50))
+    manager_details = db.relationship('Managers', backref='draftBoard')
 
 #Schemas>
 
@@ -76,9 +88,14 @@ class playerSchema(ma.ModelSchema):
 class managerSchema(ma.ModelSchema):
     class Meta:
         models = Managers
-        fields = ('id','telegramid','fplid','name','teamName')
+        fields = ('id','telegramid','fplid','name','teamName','draftPick')
 
 class draftedPlayerSchema(ma.ModelSchema):
     class Meta:
         models = Managers
         fields = ('id','managerId','playerId')
+        
+class draftedBoardSchema(ma.ModelSchema):
+    class Meta:
+        models = Managers
+        fields = ('id','teamName','draftPick','GK','DF1','DF2','MF1','MF2','FWD')

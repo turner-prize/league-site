@@ -5,6 +5,7 @@ import AnnouncementsView from './views/AnnouncementsView.vue'
 import TableView from './views/TableView.vue'
 import StatsView from './views/StatsView.vue'
 import DraftView from './views/DraftView.vue'
+import DraftBoardView from './views/DraftBoardView.vue'
 
 Vue.use(Router)
 
@@ -34,6 +35,11 @@ export default new Router({
       path: '/draftView',
       name: 'draftView',
       component: DraftView
+    },
+    {
+      path: '/draftboard',
+      name: 'draftBoardView',
+      component: DraftBoardView
     },
     {
       path: '/about',

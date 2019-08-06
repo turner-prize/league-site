@@ -1,9 +1,9 @@
 <template>
-  <div id="draftView">
+  <div id="draftView" v-if="renderComponent">
     <br>
       <form @submit.prevent="postPlayers">
         <Dropdowns
-        :playerList="managerList.filter(c => c.teamName != null)"
+        :options="managerList.filter(c => c.teamName != null)"
         name="mangers"
         v-model="Manager"
         positionName="Choose Manager">
@@ -11,7 +11,7 @@
         <br>
         <br>
         <Dropdowns 
-        :playerList="playerList.filter(c => c.element_type == 1)"
+        :options="playerList.filter(c => c.element_type == 1)"
         name="goalkeeper"
         v-model="GK"
         positionName="Choose Goalkeeper">
@@ -19,27 +19,31 @@
         <!-- {{GK}} -->
         <br>
         <Dropdowns 
-        :playerList="playerList.filter(c => c.element_type == 2)"
+        :options="playerList.filter(c => c.element_type == 2)"
         v-model="DF1"
         v-on:input="updatePlayer"
         positionName="Choose Defender 1">
         </Dropdowns>
         <!-- {{DF1}} -->
         <br>
-        <Dropdowns v-bind:playerList="playerList.filter(c => c.element_type == 2)"
+        <Dropdowns 
+        :options="playerList.filter(c => c.element_type == 2)"
         v-model="DF2"
         v-on:input="updatePlayer"
         positionName="Choose Defender 2"/>
         <br>
-        <Dropdowns v-bind:playerList="playerList.filter(c => c.element_type == 3)"
+        <Dropdowns
+        :options="playerList.filter(c => c.element_type == 3)"
         v-model="MF1"
         positionName="Choose Midfielder 1"/>
         <br>   
-        <Dropdowns v-bind:playerList="playerList.filter(c => c.element_type == 3)"
+        <Dropdowns 
+        :options="playerList.filter(c => c.element_type == 3)"
         v-model="MF2"
         positionName="Choose Midfielder 2"/>
         <br>  
-        <Dropdowns v-bind:playerList="playerList.filter(c => c.element_type == 4)"
+        <Dropdowns 
+        :options="playerList.filter(c => c.element_type == 4)"
         v-model="FWD"
         positionName="Choose Forward"/>
       <br>
@@ -53,26 +57,25 @@
 
 <script>
 import axios from 'axios'
-import Announcements from '../components/Announcements.vue'
 import Dropdowns from '../components/Dropdowns.vue'
 
 export default {
   name: 'app',
   components: {
-    Announcements,
     Dropdowns
   },
   data(){
-    return{
-      playerList: [],
-      managerList:[],
-      GK: {},
-      DF1: {},
-      DF2: {},
-      MF1: {},
-      MF2: {},
-      FWD: {},
-      Manager: {}
+      return{
+        playerList: [],
+        managerList:[],
+        GK: {},
+        DF1: {},
+        DF2: {},
+        MF1: {},
+        MF2: {},
+        FWD: {},
+        Manager: {},
+        renderComponent: true,
     }
   },
   methods:{
@@ -91,6 +94,7 @@ export default {
       }
       axios.post("http://127.0.0.1:5000/draftplayers",playerData)
           .then(res => console.log(res))
+          .then(res => this.forceReRender())
           .then(res => this.getPlayerData())
           .catch(err => console.log(err));
     },
@@ -104,6 +108,15 @@ export default {
       axios.get("http://127.0.0.1:5000/managers")
           .then(res => this.managerList = res.data)
           .catch(err => console.log(err));
+    },
+    forceReRender(){
+      console.log('rerendering')
+      this.renderComponent = false;
+      this.$nextTick(()=>{
+        this.renderComponent=true;
+      }
+
+      )
     }
   },
     created() {
