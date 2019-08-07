@@ -54,8 +54,11 @@ class PlTeams(db.Model):
 class DraftedPlayers(db.Model):
     __tablename__ = 'draftedPlayers'
     id = db.Column(db.Integer,primary_key=True)
-    managerId = db.Column(db.Integer)
-    playerId = db.Column(db.Integer)
+    managerId = db.Column(db.Integer,db.ForeignKey('managers.id'))
+    playerId = db.Column(db.Integer,db.ForeignKey('players.jfpl'))
+    manager_details = db.relationship('Managers', backref='draftedPlayers')
+    player_details = db.relationship('Players', backref='draftedPlayers')
+    
 
 class DraftBoard(db.Model):
     __tablename__ = 'draftBoard'
@@ -93,7 +96,7 @@ class managerSchema(ma.ModelSchema):
 class draftedPlayerSchema(ma.ModelSchema):
     class Meta:
         models = Managers
-        fields = ('id','managerId','playerId')
+        fields = ('id','managerId','playerId','teamName','first_name','second_name','element_type','shortname','name')
         
 class draftedBoardSchema(ma.ModelSchema):
     class Meta:

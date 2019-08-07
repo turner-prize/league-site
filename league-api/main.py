@@ -18,7 +18,7 @@ gameweeks_schema = gameweekSchema(many=True, strict=True)
 players_schema = playerSchema(many=True, strict=True)
 plTeams_schema = plTeamsSchema(many=True, strict=True)
 managers_schema = managerSchema(many=True, strict=True)
-draftboard_schema = draftedBoardSchema(many=True, strict=True)
+draftedPlayer_schema = draftedPlayerSchema(many=True, strict=True)
 
 # endpoint to show all users
 @app.route('/gameweeks', methods=['GET'])
@@ -43,9 +43,27 @@ def get_players():
                               Players.element_type,
                               Players.drafted,
                               PlTeams.shortname,
-                              PlTeams.name).filter(Players.drafted==0).all()
+                              PlTeams.name).all()
   result = players_schema.dump(all_Players)
   return jsonify(result.data)
+
+@app.route('/drafted', methods=['GET'])
+def get_drafted_players():
+  all_Players = DraftedPlayers.query.join(Players).join(Managers).join(PlTeams) \
+                    .add_columns(
+                                  DraftedPlayers.id,
+                                  DraftedPlayers.managerId,
+                                  DraftedPlayers.playerId,
+                                  Managers.name,
+                                  Managers.teamName,
+                                  Players.first_name,
+                                  Players.second_name,
+                                  Players.element_type,
+                                  PlTeams.shortname,
+                                  PlTeams.name).all()
+  result = draftedPlayer_schema.dump(all_Players)
+  return jsonify(result.data)
+
 
 @app.route('/draftplayers', methods=['POST'])
 def recieve_players():
