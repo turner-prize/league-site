@@ -44,6 +44,11 @@ class Managers(db.Model):
     name = db.Column(db.String(50))
     teamName = db.Column(db.String(50))
     draftPick = db.Column(db.Integer)
+    TC = db.Column(db.Integer)
+    BB = db.Column(db.Integer)
+    FH = db.Column(db.Integer)
+    WC1 = db.Column(db.Integer)
+    WC2 = db.Column(db.Integer)
     
 class PlTeams(db.Model):
     __tablename__ = 'plTeams'
@@ -59,6 +64,12 @@ class DraftedPlayers(db.Model):
     manager_details = db.relationship('Managers', backref='draftedPlayers')
     player_details = db.relationship('Players', backref='draftedPlayers')
     
+class Fixtures(db.Model):
+    __tablename__ = 'fixtures'
+    id = db.Column(db.Integer,primary_key=True)
+    gameweek = db.Column(db.Integer,db.ForeignKey('gameweeks.id'))
+    managerId = db.Column(db.Integer,db.ForeignKey('managers.id'))
+    managerId = db.Column(db.Integer,db.ForeignKey('managers.id'))
 
 class DraftBoard(db.Model):
     __tablename__ = 'draftBoard'
