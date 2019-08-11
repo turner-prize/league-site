@@ -32,6 +32,7 @@ class Players(Base):
     event_points = Column(Integer)
     first_name = Column(String(50))
     second_name = Column(String(50))
+    web_name = Column(String(50))
     team = Column(Integer)
     team_code = Column(Integer)
     goals_scored = Column(Integer)
@@ -54,11 +55,58 @@ class PlFixtures(Base):
     started = Column(String(50))
     finished = Column(String(50))
 
+class Fixtures(Base):
+    __tablename__ = 'fixtures'
+    id = Column(Integer,primary_key=True)
+    gameweek = Column(Integer)
+    managerId = Column(Integer)
+    opponentId = Column(Integer)
+    points = Column(Integer)
+    score = Column(Integer)
+
 class PlTeams(Base):
     __tablename__ = 'plTeams'
     id = Column(Integer,primary_key=True)
     name = Column(String(50))
     shortname = Column(Integer)
+
+class Managers(Base):
+    __tablename__ = 'managers'
+    id = Column(Integer,primary_key=True)
+    telegramId = Column(Integer)
+    fplId = Column(Integer)
+    name = Column(String(50))
+    teamName= Column(String(50))
+    draftPick = Column(Integer)
+    TC = Column(Integer)
+    BB = Column(Integer)
+    FH = Column(Integer)
+    WC1 = Column(Integer)
+    WC2  = Column(Integer)
+    
+class Teams(Base):
+    __tablename__ = 'teams'
+    id = Column(Integer,primary_key=True)
+    gameweek = Column(Integer)
+    managerId = Column(Integer)
+    playerId =  Column(Integer)
+    points = Column(Integer)
+    is_captain = Column(Integer)
+    is_bench = Column(Integer)
+    reefed = Column(Integer)
+
+class DraftedPlayers(Base):
+    __tablename__ = 'draftedPlayers'
+    id = Column(Integer,primary_key=True)
+    managerId = Column(Integer)
+    playerId =  Column(Integer)
+
+class Table(Base):
+    __tablename__ = 'table'
+    position = Column(Integer)
+    managerId =  Column(Integer,primary_key=True)
+    score =  Column(Integer)
+    points =  Column(Integer)
 
 def populateGameweeks():
     r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
@@ -87,6 +135,7 @@ def populatePlayers():
                         event_points = i['event_points'],
                         first_name = i['first_name'],
                         second_name = i['second_name'],
+                        web_name= i['web_name'],
                         team = i['team'],
                         team_code = i['team_code'],
                         goals_scored = i['goals_scored'],
@@ -103,9 +152,11 @@ def populatePlayers():
     session.close()
 
 def populatePlFixtures():
-    r = requests.get("https://fantasy.premierleague.com/api/fixtures/?event=1")
-    fixtureData = r.json()
     session=CreateSession()
+    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
+    gw = gw[0]
+    r = requests.get(f"https://fantasy.premierleague.com/api/fixtures/?event={gw}")
+    fixtureData = r.json()
     for i in fixtureData:
         fxtr = PlFixtures(  id = i['id'],
                             kickoff_time = i['kickoff_time'],
@@ -130,6 +181,31 @@ def populatePlTeams():
         session.add(tm)
         session.commit()
     session.close()
+    
+def populateFixtures():
+    for i in range(1,5):
+        r = requests.get(f"https://fantasy.premierleague.com/api/leagues-h2h-matches/league/326910/?page={i}")
+        data = r.json()
+        fixtureData = data['results']
+        
+        session=CreateSession()
+        
+        for f in fixtureData:
+            teamfplid = f['entry_1_entry']
+            opponentId = f['entry_2_entry']
+            m = session.query(Managers).filter_by(fplId=teamfplid).first()
+            o = session.query(Managers).filter_by(fplId=opponentId).first()
+            fxtr = Fixtures(gameweek = f['event'],
+                            managerId = m.id,
+                            opponentId = o.id)
+            rvrsfxtr = Fixtures(gameweek = f['event'],
+                            managerId = o.id,
+                            opponentId = m.id)
+            session.add(fxtr)
+            session.add(rvrsfxtr)
+        session.commit()
+        session.close()
+        
 
 def createCronJobs():
     session=CreateSession()
