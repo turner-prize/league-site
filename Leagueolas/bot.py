@@ -10,7 +10,7 @@ def MessageCheck(Message):
         if re.search('(^|\s)'+iname+'(\s|$)',Message,re.I):
             return True            
                 
-BotToken='580359883:AAEFmZ-M_OWWF6GcDVpRsgEDN5GiERnlpJ4'
+BotToken='token goes here'
                 
 updater = Updater(token=BotToken)
 j = updater.job_queue

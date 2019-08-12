@@ -4,4 +4,4 @@ import time
 while True:
     updatePlFixtures()
     updateGameweekPlayers()
-    #time.sleep(60)
+    time.sleep(60)
