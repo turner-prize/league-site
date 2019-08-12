@@ -33,7 +33,7 @@ def render_mpl_table(data,filename, col_width=3.0, row_height=0.625, font_size=1
     fig.savefig(filename)
     return ax
 
-def updateTable():
+def createTable():
     session=CreateSession()
     t = session.query(Table,Managers).filter(Table.managerId == Managers.id).all()
     values = [(i[1].teamName,i[0].score,i[0].points) for i in t]
@@ -79,10 +79,9 @@ def produceTable():
     session.commit()
     session.close()
 
-def updateTable():
+def updateFixturesWithTablePoints():
     session=CreateSession()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     fixtures = session.query(Fixtures).filter_by(gameweek=gw).all()
     for f in fixtures:
         scores = session.query(Teams).filter_by(managerId=f.managerId).filter_by(gameweek=gw).filter_by(is_bench=0).all()
@@ -121,8 +120,7 @@ def updateTable():
 
 def updatePlFixtures():
     session=CreateSession()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     r = requests.get(f"https://fantasy.premierleague.com/api/fixtures/?event={gw}")
     fixtureData = r.json()
     for games in fixtureData:
@@ -140,10 +138,35 @@ def reefed(session,managerId,playerId,gw):
     reefed = session.query(Teams.reefed).filter_by(managerId=managerId).filter_by(playerId=playerId).filter_by(gameweek=gw).first()
     return reefed[0]
 
+def updateTeamsFinalBench():
+    session=CreateSession()
+    m = session.query(Managers).all()
+    gw = GetGameweek(session)
+    for i in m:
+        fplid = i.fplId
+        r = requests.get(f"https://fantasy.premierleague.com/api/entry/{fplid}/event/{gw}/picks/")
+        team = r.json()
+        for p in team['picks']:
+            if p['is_captain']:
+                cap = 1
+            else:
+                cap = 0
+            if not BenchBoost(session,i.id,gw):
+                if p['position']> 11:
+                    bench = 1
+                else:
+                    bench = 0
+            else:
+                bench = 0
+            plyr = session.query(Teams).filter_by(playerId=p['element']).filter_by(managerId=i.id).filter_by(gameweek=gw).first()
+            plyr.is_bench = bench
+            session.add(plyr)
+    session.commit()
+    session.close()
+
 def updateGameweekPlayers():
     session=CreateSession()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     players = session.query(Teams.playerId).filter_by(gameweek=gw).all()
     players = {p[0] for p in players}
     urls = [f"https://fantasy.premierleague.com/api/element-summary/{i}" for i in players]
@@ -172,8 +195,7 @@ def updateGameweekPlayers():
 
 def checkReefs():
     session=CreateSession()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     drafted = session.query(DraftedPlayers).all()
     managers = session.query(Managers).all()
     
@@ -198,8 +220,7 @@ def checkReefs():
     
 def checkDrops():
     session=CreateSession()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     drafted = session.query(DraftedPlayers).all()
     
     for d in drafted:
@@ -219,8 +240,7 @@ def checkDrops():
 def updateChips():
     session=CreateSession()
     m = session.query(Managers).all()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     for i in m:
         fplid = i.fplId
         r = requests.get(f"https://fantasy.premierleague.com/api/entry/{fplid}/event/{gw}/picks/")
@@ -242,8 +262,7 @@ def updateChips():
 def updatePlPlayers():
     session=CreateSession()
     p = session.query(Players).delete()
-    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
-    bootstrapData = r.json()
+    bootstrapData = GetBootstraData()
     playerData = bootstrapData['elements']
     for i in playerData:
         plyr = Players( jfpl = i['id'],
@@ -274,8 +293,7 @@ def BenchBoost(session,managerId,gw):
 def updateTeams():
     session=CreateSession()
     m = session.query(Managers).all()
-    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
-    gw = gw[0]
+    gw = GetGameweek(session)
     for i in m:
         fplid = i.fplId
         r = requests.get(f"https://fantasy.premierleague.com/api/entry/{fplid}/event/{gw}/picks/")
@@ -305,8 +323,7 @@ def updateTeams():
                         
 
 def updateGameweeks():
-    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
-    bootstrapData = r.json()
+    bootstrapData = GetBootstraData()
     gameweekData = bootstrapData['events']
     
     for i in gameweekData:
@@ -329,6 +346,14 @@ def updateGameweeks():
         session.add(nw)
     session.commit()
     session.close()
+
+def GetBootstrapData():
+    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
+    return r.json()
+
+def GetGameweek(session):
+    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
+    return gw[0]
 
 def resetGameweeks(session):
     tw = session.query(Gameweeks).all()

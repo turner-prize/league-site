@@ -2,7 +2,7 @@
 
 from telegram.ext import Updater,CommandHandler, MessageHandler, BaseFilter, Filters
 import time
-import commands
+import data.commands
 
 def MessageCheck(Message):
     MyList = ["Dan","Neil","Shed","Matt","Shane","Ads","Tom","Elliott","Crigs","Rholo","Sam"]

@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
-
 from flask_cors import CORS
-from models import Gameweeks,gameweekSchema, db, ma, Players,playerSchema, PlTeams, plTeamsSchema, Managers, managerSchema, DraftedPlayers, draftedPlayerSchema,DraftBoard, draftedBoardSchema
+from data.flask_models import Gameweeks,gameweekSchema, db, ma, Players,playerSchema, PlTeams, plTeamsSchema, Managers, managerSchema, DraftedPlayers, draftedPlayerSchema,DraftBoard, draftedBoardSchema
 import json
 import random
 import os
