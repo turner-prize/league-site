@@ -10,7 +10,7 @@ def MessageCheck(Message):
         if re.search('(^|\s)'+iname+'(\s|$)',Message,re.I):
             return True            
                 
-BotToken='395243580:AAGrDXsMYzCs0h1NkNt66tLtgYTW4tvdCeo'
+BotToken='token goes here'
                 
 updater = Updater(token=BotToken)
 j = updater.job_queue
@@ -30,6 +30,12 @@ def Scores(bot,update,args):
         msg = commands.getOneScore(id)
         bot.send_message(chat_id=update.message.chat_id,text=msg)
 
+def Table(bot,update):
+    bot.send_photo(chat_id=update.message.chat_id, photo=open('table.png', 'rb'))
+
+def DraftList(bot,update):
+    bot.send_message(chat_id=update.message.chat_id,text=commands.DraftList())
+
 #---Handlers
 #------Commands
 Handlers = [] # Command Handlers
@@ -40,7 +46,8 @@ def AF2L(FunctionName): # add function 2 list
 #------Messages
 
 AF2L(CommandHandler('scores', Scores,pass_args=True))
-
+AF2L(CommandHandler('table', Table))
+AF2L(CommandHandler('draftlist', DraftList))
 
 for f in Handlers:
     dispatcher.add_handler(f)

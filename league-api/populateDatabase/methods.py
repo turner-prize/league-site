@@ -1,9 +1,51 @@
 from models import Gameweeks, CreateSession, Managers, Teams,Players,DraftedPlayers, Fixtures, PlFixtures, Table
 from sqlalchemy import update, Integer, desc
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased,sessionmaker
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import pandas
+import numpy as np
+import matplotlib.pyplot as plt
+import six
+import os
 
+def render_mpl_table(data,filename, col_width=3.0, row_height=0.625, font_size=14,
+                     header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
+                     bbox=[0, 0, 1, 1], header_columns=0,
+                     ax=None, **kwargs):
+    if ax is None:
+        size = (np.array(data.shape[::-1]) + np.array([0, 1])) * np.array([col_width, row_height])
+        fig, ax = plt.subplots(figsize=size)
+        ax.axis('off')
+
+    mpl_table = ax.table(cellText=data.values, bbox=bbox, colLabels=data.columns, **kwargs)
+
+    mpl_table.auto_set_font_size(False)
+    mpl_table.set_fontsize(font_size)
+
+    for k, cell in  six.iteritems(mpl_table._cells):
+        cell.set_edgecolor(edge_color)
+        if k[0] == 0 or k[1] < header_columns:
+            cell.set_text_props(weight='bold', color='w')
+            cell.set_facecolor(header_color)
+        else:
+            cell.set_facecolor(row_colors[k[0]%len(row_colors) ])
+    fig.savefig(filename)
+    return ax
+
+def updateTable():
+    session=CreateSession()
+    t = session.query(Table,Managers).filter(Table.managerId == Managers.id).all()
+    values = [(i[1].teamName,i[0].score,i[0].points) for i in t]
+    session.close()
+    df = pandas.DataFrame(values, columns = ['Team' , 'PlayerScore', 'Points'])
+    df = df.sort_values(['Points','PlayerScore'], ascending=[False, False])
+    df = df.reset_index()
+    df.drop('index', axis=1, inplace=True)
+    df['#'] = df.index +1
+    df['#'] = df['#'].apply(lambda x: "{}{}".format(x, (' '*15) ))
+    df = df[['#','Team', 'PlayerScore', 'Points']]
+    render_mpl_table(df,'table.png')
 
 def TripleCaptain(session,managerId,gw):
     TC = session.query(Managers).filter_by(id=managerId).filter_by(TC=gw).first()
@@ -36,12 +78,6 @@ def produceTable():
         session.add(tb)
     session.commit()
     session.close()
-
-try:
-    produceTable()
-except Exception as e:
-    print(e)
-input()
 
 def updateTable():
     session=CreateSession()
@@ -175,7 +211,7 @@ def checkDrops():
             dropString = f'{playerName[0]} has been dropped by {managerName[0]}'
             #send dropString to Bot
             #delete players from draftlist
-            #p = session.query(DraftedPlayers).filter_by(playerId=d.playerId).delete()
+            p = session.query(DraftedPlayers).filter_by(playerId=d.playerId).delete()
     session.commit()
     session.close()
     
@@ -192,6 +228,13 @@ def updateChips():
         if team['active_chip'] != 'null':
             if team['active_chip'] == '3xc':
                 i.TC = gw
+            if team['active_chip'] == 'bboost':
+                i.BB = gw
+            if team['active_chip'] == 'freehit':
+                i.FH = gw
+            if team['active_chip'] == 'wildcard':
+                i.WC1 = gw
+            
     session.commit()
     session.close()
 

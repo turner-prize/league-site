@@ -9,7 +9,7 @@ from dateutil import tz
 from collections import namedtuple
 
 def CreateSession():
-        engine = create_engine(f"sqlite:///C:/Users/Turner_prize/Desktop/league-site/league-api/league.db")#,echo=True)
+        engine = create_engine(f"sqlite:///C:/Users/Dan/Desktop/league-site/league-api/league.db")#,echo=True)
         Session = sessionmaker(bind=engine)
         Base.metadata.create_all(engine)
         return Session()

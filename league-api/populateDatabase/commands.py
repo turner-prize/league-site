@@ -1,6 +1,42 @@
-from models import CreateSession, Gameweeks, Fixtures, Teams, Managers,Players,PlFixtures
-from sqlalchemy import or_
+from models import CreateSession, Gameweeks, Fixtures, Teams, Managers,Players,PlFixtures,DraftedPlayers, PlTeams
+from sqlalchemy import or_,desc
 
+
+def GetPos(position):
+    if position == 1:
+        p = 'GKP'
+    elif position == 2:
+        p = 'DEF'
+    elif position == 3:
+        p = 'MID'
+    elif position == 4:
+        p = 'FWD'
+    return p
+
+def DraftList(pos=None):
+    session = CreateSession()
+    manager = session.query(Managers,DraftedPlayers,Players, PlTeams) \
+                        .filter(Managers.id==DraftedPlayers.managerId) \
+                        .filter(Players.jfpl==DraftedPlayers.playerId) \
+                        .filter(Players.team==PlTeams.id) \
+                        .order_by(desc(Managers.id)) \
+                        .order_by(Players.element_type) \
+                        .all()
+    dlist = {}
+    for i in manager:
+        if not i[0].teamName in dlist:
+            dlist[i[0].teamName]=[]
+        pos = GetPos(i[2].element_type)
+        draftString = f'{pos} - {i[2].web_name} - {i[3].shortname}'
+        dlist[i[0].teamName].append(draftString)
+        
+    dString=''
+    for k,v in dlist.items():
+        dString=dString + f"\n{k}:"
+        for dl in v:
+            dString=dString + f"\n\t{dl}"
+        dString=dString + f'\n'
+    return dString
 
 
 def Played(session,gw,managedId):
