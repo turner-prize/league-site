@@ -33,8 +33,14 @@ def Scores(bot,update,args):
 def Table(bot,update):
     bot.send_photo(chat_id=update.message.chat_id, photo=open('table.png', 'rb'))
 
-def DraftList(bot,update):
-    bot.send_message(chat_id=update.message.chat_id,text=commands.DraftList())
+def DraftList(bot, update, args):
+    if args:
+        if not args[0].upper() in ['GKP','DEF','MID','FWD']:
+            bot.send_message(chat_id=update.message.chat_id,text='Please use the following arguements for position:\nGKP\nDEF\nMID\nFWD')
+        else:
+            bot.send_message(chat_id=update.message.chat_id,text=commands.DraftList(args[0].upper()))
+    else:
+        bot.send_message(chat_id=update.message.chat_id,text=commands.DraftList())
 
 #---Handlers
 #------Commands
@@ -47,7 +53,7 @@ def AF2L(FunctionName): # add function 2 list
 
 AF2L(CommandHandler('scores', Scores,pass_args=True))
 AF2L(CommandHandler('table', Table))
-AF2L(CommandHandler('draftlist', DraftList))
+AF2L(CommandHandler('draftlist', DraftList,pass_args=True))
 
 for f in Handlers:
     dispatcher.add_handler(f)

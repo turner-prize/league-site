@@ -13,15 +13,37 @@ def GetPos(position):
         p = 'FWD'
     return p
 
+def ElementType(position):
+    if position == 'GKP':
+        p = 1
+    elif position == 'DEF':
+        p = 2
+    elif position == 'MID':
+        p = 3
+    elif position == 'FWD':
+        p = 4
+    return p
+
 def DraftList(pos=None):
     session = CreateSession()
-    manager = session.query(Managers,DraftedPlayers,Players, PlTeams) \
-                        .filter(Managers.id==DraftedPlayers.managerId) \
-                        .filter(Players.jfpl==DraftedPlayers.playerId) \
-                        .filter(Players.team==PlTeams.id) \
-                        .order_by(desc(Managers.id)) \
-                        .order_by(Players.element_type) \
-                        .all()
+    if pos:
+        p = ElementType(pos)
+        manager = session.query(Managers,DraftedPlayers,Players, PlTeams) \
+                            .filter(Managers.id==DraftedPlayers.managerId) \
+                            .filter(Players.jfpl==DraftedPlayers.playerId) \
+                            .filter(Players.team==PlTeams.id) \
+                            .filter(Players.element_type==p) \
+                            .order_by(desc(Managers.id)) \
+                            .order_by(Players.element_type) \
+                            .all()
+    else:
+        manager = session.query(Managers,DraftedPlayers,Players, PlTeams) \
+                            .filter(Managers.id==DraftedPlayers.managerId) \
+                            .filter(Players.jfpl==DraftedPlayers.playerId) \
+                            .filter(Players.team==PlTeams.id) \
+                            .order_by(desc(Managers.id)) \
+                            .order_by(Players.element_type) \
+                            .all()
     dlist = {}
     for i in manager:
         if not i[0].teamName in dlist:
