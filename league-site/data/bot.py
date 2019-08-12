@@ -2,7 +2,7 @@
 
 from telegram.ext import Updater,CommandHandler, MessageHandler, BaseFilter, Filters
 import time
-import data.commands
+import commands
 
 def MessageCheck(Message):
     MyList = ["Dan","Neil","Shed","Matt","Shane","Ads","Tom","Elliott","Crigs","Rholo","Sam"]
@@ -10,7 +10,7 @@ def MessageCheck(Message):
         if re.search('(^|\s)'+iname+'(\s|$)',Message,re.I):
             return True            
                 
-BotToken='token goes here'
+BotToken='395243580:AAGrDXsMYzCs0h1NkNt66tLtgYTW4tvdCeo'
                 
 updater = Updater(token=BotToken)
 j = updater.job_queue
@@ -42,10 +42,17 @@ def DraftList(bot, update, args):
     else:
         bot.send_message(chat_id=update.message.chat_id,text=commands.DraftList())
 
+def PlayersDetailed(bot,update):
+    id = update.message.from_user['id']
+    msg = commands.PlayersDetailed(id)
+    bot.send_message(chat_id=update.message.chat_id,text=msg)
+
 #---Handlers
 #------Commands
 Handlers = [] # Command Handlers
 
+
+    
 def AF2L(FunctionName): # add function 2 list
     Handlers.append(FunctionName)
 
@@ -53,6 +60,7 @@ def AF2L(FunctionName): # add function 2 list
 
 AF2L(CommandHandler('scores', Scores,pass_args=True))
 AF2L(CommandHandler('table', Table))
+AF2L(CommandHandler('playersdetailed', PlayersDetailed))
 AF2L(CommandHandler('draftlist', DraftList,pass_args=True))
 
 for f in Handlers:
