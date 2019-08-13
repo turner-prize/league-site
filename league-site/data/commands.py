@@ -12,14 +12,15 @@ def WhoHas(playerName):
             gotString = f'{i[1].first_name} {i[1].second_name} was drafted by {i[2].teamName}'
 
     else:
-        playerdict = {i.web_name.encode("utf-8"):i.jfpl for i in session.query(Players).all()}
+        playerdict = {i.web_name:i.jfpl for i in session.query(Players).all()}
         playerlist = [i.web_name for i in session.query(Players).all()]
+
+		
         extraction = process.extract(playerName, playerlist)
 
-        playerId = playerdict[extraction[0][0].encode("utf-8")]
-        print(playerdict['Pieters'].encode("utf-8"))
+        playerId = playerdict[extraction[0][0]]
 
-        draftedPlayer = session.query(DraftedPlayers,Players, Managers).filter(DraftedPlayers.playerId==playerId).filter(DraftedPlayers.playerId==Players.jfpl).filter(DraftedPlayers.managerId==Managers.id).first()
+        draftedPlayer = session.query(DraftedPlayers,Players, Managers).filter(DraftedPlayers.playerId==Players.jfpl).filter_by(playerId=playerId).filter(DraftedPlayers.managerId==Managers.id).first()
         if draftedPlayer:
             gotString = f'{draftedPlayer[1].first_name} {draftedPlayer[1].second_name} was drafted by {draftedPlayer[2].teamName}'
 
@@ -28,7 +29,7 @@ def WhoHas(playerName):
             gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
             gw = gw[0]
             
-            scores = session.query(Teams,Players, Managers).filter(Teams.playerId==playerId).filter(Teams.playerId==Players.jfpl).filter(Teams.managerId==Managers.id).filter_by(gameweek=gw).all()
+            scores = session.query(Teams,Players, Managers).filter(Teams.playerId==playerId).filter(Teams.playerId==Players.jfpl).filter(Teams.managerId==Managers.id).filter_by(playerId=playerId).filter_by(gameweek=gw).all()
             
             if scores:
                 gotString = ''
@@ -37,7 +38,7 @@ def WhoHas(playerName):
             
             else:
                 draftedPlayer = session.query(Players).filter(Players.jfpl==playerId).first()
-                gotString = f'No one has {i[1].first_name} {i[1].second_name}'
+                gotString = f'No one has {draftedPlayer.first_name} {draftedPlayer.second_name}'
             
     session.close()
     print(gotString)
