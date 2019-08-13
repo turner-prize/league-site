@@ -1,11 +1,12 @@
 from models import CreateSession,PlFixtures
-from methods import updatePlFixtures, updateGameweekPlayers
+from methods import updatePlFixtures, updateGameweekPlayers,updateFixturesWithTablePoints,produceTable,createTable
 import time
-import datetime
+from datetime import datetime, timedelta
 from dateutil import tz
 from collections import namedtuple
+from loguru import logger
 
-def createCronJobs():
+def GetFixtures():
     session=CreateSession()
     q = session.query(PlFixtures.kickoff_time) \
             .distinct(PlFixtures.kickoff_time) \
@@ -14,10 +15,8 @@ def createCronJobs():
     dtRanges=[]
     for i in q:
         #timezone is UTC from database, need to change to current TZ
-        dt = datetime.datetime.strptime(i.kickoff_time,'%Y-%m-%dT%H:%M:%SZ')
-        dt=dt.replace(tzinfo=tz.gettz('UTC'))
-        KickoffTime=dt.astimezone(tz.tzlocal())
-        GameEndTime=KickoffTime + datetime.timedelta(hours=2)
+        KickoffTime = datetime.strptime(i.kickoff_time,'%Y-%m-%dT%H:%M:%SZ')
+        GameEndTime=KickoffTime + timedelta(hours=2)
         rng = (KickoffTime,GameEndTime)
         dtRanges.append(rng)
     session.close()
@@ -44,11 +43,37 @@ def LoopIt(rng):
             pass
     return rng
 
-x=createCronJobs()
-for i in x:
-	print(i[1] - i[0])
+def setupLogger():
+        logger.add('cronlog.log', format="{time} {level} {message}")
 
-#while True:
-#    updatePlFixtures()
-#    updateGameweekPlayers()
-#    time.sleep(60)
+def getRangeNumber():
+    x=GetFixtures()
+    y = min([abs(i[0] - datetime.utcnow()) for i in x])
+    z = {abs(i[0] - datetime.utcnow()):i[0] for i in x}
+
+    for i in x:
+        if i[0] == z[y]:
+            myDifference = i[1] - i[0]
+            
+    return myDifference.seconds / 120
+
+
+setupLogger()
+
+#If regular game, do until just past full time.
+#if last game of day, do until bonus is added. 
+#If last game of week, do until league is updated, and then run 'updateteamsfinalbench' from methods.
+#in both last game of day/week, past full time drop the fetching to every 15 minutes.
+
+for i in range(getRangeNumber()):
+    try:
+        updatePlFixtures()
+        updateGameweekPlayers()
+	updateFixturesWithTablePoints()
+	produceTable()
+	createTable()
+        time.sleep(120)
+    except Exception as e:
+        logger.log('Error!')
+        logger.log(e)
+        break

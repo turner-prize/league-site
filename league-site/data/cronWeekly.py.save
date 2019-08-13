@@ -6,7 +6,6 @@ import datetime
 import time
 from crontab import CronTab
 from collections import namedtuple
-from loguru import logger
 
 def getKickoffTimes():
     session=CreateSession()
@@ -59,7 +58,7 @@ def DateToCron():
 
 def CreateWeeklyCronjob():
 	cron = CronTab(user='turner_prize')
-	job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronWeekly.py')
+	job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronWeekly.py',comment='testcomment')
 	dt = DateToCron()
 	job.setall(dt)
 	cron.write()
@@ -67,7 +66,12 @@ def CreateWeeklyCronjob():
 def CreateMatchCronjobs():
 	cron = CronTab(user='turner_prize')
 	for i in getKickoffTimes():
-		job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cron.py',comment='Gameweek Match')
+       cron = CronTab(user='turner_prize')
+        job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronWeekly.py',comment='testcomment')
+        dt = DateToCron()
+        job.setall(dt)
+        cron.write()
+
 		job.setall(i[0])
 		cron.write()
 
@@ -80,9 +84,6 @@ def DataAvailable():
     except ValueError:
         return False
 
-def setupLogger():
-	logger.add('weeklySetupLog.log', format="{time} {level} {message}")
-
 def WeeklySetup():
     updateGameweeks()
     updatePlFixtures
@@ -91,24 +92,16 @@ def WeeklySetup():
     updateChips()
     checkDrops()
     checkReefs()
-    CreateMatchCronJobs()
     CreateWeeklyCronjob()
     
 
-if __name__ == "__main__":
-	setupLogger()
-	while True:
-		try:
-			logger.info('trying to access api')
-			if DataAvailable():
-				logger.info('success! running weekly setup')
-				WeeklySetup()
-				break
-			else:
-				logger.info('not available, sleeping for 2 minutes')
-				sleep(120)
-		except Exception as e:
-			logger.info('Error:')
-			logger.info(e)
-			break
-	
+CreateMatchCronjobs()
+
+#while True:
+#	if DataAvailable():
+#		WeeklySetup()
+#		break
+#	else:
+#		sleep(120)
+
+

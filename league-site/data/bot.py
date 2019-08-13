@@ -3,15 +3,15 @@
 from telegram.ext import Updater,CommandHandler, MessageHandler, BaseFilter, Filters
 import time
 import commands
+from token import BotToken
 
 def MessageCheck(Message):
     MyList = ["Dan","Neil","Shed","Matt","Shane","Ads","Tom","Elliott","Crigs","Rholo","Sam"]
     for iname in MyList:
         if re.search('(^|\s)'+iname+'(\s|$)',Message,re.I):
-            return True            
-                
-BotToken='395243580:AAGrDXsMYzCs0h1NkNt66tLtgYTW4tvdCeo'
-                
+            return True
+
+
 updater = Updater(token=BotToken)
 j = updater.job_queue
 dispatcher = updater.dispatcher

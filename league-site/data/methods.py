@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import six
 import os
 import telegram
+from token import BotToken
 
 def sendMsg(msg):
     chats =     [282457851,
@@ -22,7 +23,7 @@ def sendMsg(msg):
                  420261096,
                  402233322,
                  668999191]
-    bot = telegram.Bot(token='395243580:AAGrDXsMYzCs0h1NkNt66tLtgYTW4tvdCeo')
+    bot = telegram.Bot(token=BotToken)
     for i in chats:
         try:
             bot.send_message(chat_id=i, text=msg)
@@ -285,7 +286,7 @@ def updateChips():
 def updatePlPlayers():
     session=CreateSession()
     p = session.query(Players).delete()
-    bootstrapData = GetBootstraData()
+    bootstrapData = GetBootstrapData()
     playerData = bootstrapData['elements']
     for i in playerData:
         plyr = Players( jfpl = i['id'],
@@ -346,7 +347,7 @@ def updateTeams():
                         
 
 def updateGameweeks():
-    bootstrapData = GetBootstraData()
+    bootstrapData = GetBootstrapData()
     gameweekData = bootstrapData['events']
     
     for i in gameweekData:
