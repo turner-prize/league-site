@@ -1,5 +1,9 @@
+from models import CreateSession,PlFixtures
 from methods import updatePlFixtures, updateGameweekPlayers
 import time
+import datetime
+from dateutil import tz
+from collections import namedtuple
 
 def createCronJobs():
     session=CreateSession()
@@ -40,7 +44,11 @@ def LoopIt(rng):
             pass
     return rng
 
-while True:
-    updatePlFixtures()
-    updateGameweekPlayers()
-    time.sleep(60)
+x=createCronJobs()
+for i in x:
+	print(i[1] - i[0])
+
+#while True:
+#    updatePlFixtures()
+#    updateGameweekPlayers()
+#    time.sleep(60)

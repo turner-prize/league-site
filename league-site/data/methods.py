@@ -8,6 +8,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 import six
 import os
+import telegram
+
+def sendMsg(msg):
+    chats =     [282457851,
+                 423370337,
+                 331801993,
+                 408778637,
+                 346959464,
+                 392414867,
+                 404362781,
+                 420101994,
+                 420261096,
+                 402233322,
+                 668999191]
+    bot = telegram.Bot(token='395243580:AAGrDXsMYzCs0h1NkNt66tLtgYTW4tvdCeo')
+    for i in chats:
+        try:
+            bot.send_message(chat_id=i, text=msg)
+        except:
+            print(i)
+            pass
+
+
 
 def render_mpl_table(data,filename, col_width=3.0, row_height=0.625, font_size=14,
                      header_color='#40466e', row_colors=['#f1f1f2', 'w'], edge_color='w',
@@ -211,7 +234,7 @@ def checkReefs():
                 reefedFrom = session.query(DraftedPlayers.managerId).filter_by(playerId=d).first()
                 reefedFrom = session.query(Managers.name).filter_by(id=reefedFrom[0]).first()
                 reefString = f'{managerName} has reefed {playerName[0]} from {reefedFrom[0]}'
-                #send reefString to Bot
+                sendMsg(reefString)
                 r = session.query(Teams).filter(Teams.managerId == m.id).filter_by(playerId = d).filter_by(gameweek=gw).first()
                 r.reefed = 1
                 session.add(r)
@@ -230,7 +253,7 @@ def checkDrops():
             playerName = session.query(Players.web_name).filter_by(jfpl=d.playerId).first()
             managerName = session.query(Managers.name).filter_by(id=d.managerId).first()
             dropString = f'{playerName[0]} has been dropped by {managerName[0]}'
-            #send dropString to Bot
+            sendMsg(dropString)
             #delete players from draftlist
             p = session.query(DraftedPlayers).filter_by(playerId=d.playerId).delete()
     session.commit()

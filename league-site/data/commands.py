@@ -2,7 +2,6 @@ from models import CreateSession, Gameweeks, Fixtures, Teams, Managers,Players,P
 from sqlalchemy import or_,desc
 from fuzzywuzzy import process
 
-
 def WhoHas(playerName):
     session = CreateSession()
     
@@ -41,11 +40,9 @@ def WhoHas(playerName):
                 gotString = f'No one has {draftedPlayer.first_name} {draftedPlayer.second_name}'
             
     session.close()
-    print(gotString)
+    return gotString
     
        
-WhoHas('Pieters')
-input()
         
 def GetPos(position):
     if position == 1:

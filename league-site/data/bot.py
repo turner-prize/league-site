@@ -47,6 +47,10 @@ def PlayersDetailed(bot,update):
     msg = commands.PlayersDetailed(id)
     bot.send_message(chat_id=update.message.chat_id,text=msg)
 
+def WhoHas(bot, update, args):
+    if args:
+    	bot.send_message(chat_id=update.message.chat_id, text=commands.WhoHas(args[0]))
+
 #---Handlers
 #------Commands
 Handlers = [] # Command Handlers
@@ -62,6 +66,8 @@ AF2L(CommandHandler('scores', Scores,pass_args=True))
 AF2L(CommandHandler('table', Table))
 AF2L(CommandHandler('playersdetailed', PlayersDetailed))
 AF2L(CommandHandler('draftlist', DraftList,pass_args=True))
+AF2L(CommandHandler('whohas', WhoHas,pass_args=True))
+
 
 for f in Handlers:
     dispatcher.add_handler(f)
