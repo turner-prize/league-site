@@ -1,4 +1,4 @@
-from models import CreateSession,PlFixtures
+from models import CreateSession,PlFixtures,Players
 from methods import updatePlFixtures, updateGameweekPlayers,updateFixturesWithTablePoints,produceTable,createTable
 import time
 from datetime import datetime, timedelta
@@ -9,9 +9,9 @@ from loguru import logger
 def GetFixtures():
     session=CreateSession()
     q = session.query(PlFixtures.kickoff_time) \
-            .distinct(PlFixtures.kickoff_time) \
-            .order_by(PlFixtures.kickoff_time) \
-            .all()
+        .distinct(PlFixtures.kickoff_time) \
+        .order_by(PlFixtures.kickoff_time) \
+        .all()
     dtRanges=[]
     for i in q:
         #timezone is UTC from database, need to change to current TZ
@@ -51,14 +51,13 @@ def getRangeNumber():
     y = min([abs(i[0] - datetime.utcnow()) for i in x])
     z = {abs(i[0] - datetime.utcnow()):i[0] for i in x}
 
+
     for i in x:
         if i[0] == z[y]:
             myDifference = i[1] - i[0]
+            timer = myDifference.seconds / 120
             
-    return myDifference.seconds / 120
-
-
-setupLogger()
+    return timer
 
 #If regular game, do until just past full time.
 
@@ -77,13 +76,15 @@ setupLogger()
 
 #in both last game of day/week, past full time drop the fetching to every 15 minutes.
 
+
+setupLogger()
 for i in range(getRangeNumber()):
     try:
         updatePlFixtures()
         updateGameweekPlayers()
-	updateFixturesWithTablePoints()
-	produceTable()
-	createTable()
+        updateFixturesWithTablePoints()
+        produceTable()
+        createTable()
         time.sleep(120)
     except Exception as e:
         logger.log('Error!')

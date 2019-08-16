@@ -71,6 +71,29 @@ def CreateMatchCronjobs():
 		job.setall(i[0])
 		cron.write()
 
+def CreateBonusCronjobs():
+    cron = CronTab(user='turner_prize')
+    session=CreateSession()
+    q = session.query(PlFixtures.kickoff_time).all()
+    gameDays = set([datetime.strptime(i[0],'%Y-%m-%dT%H:%M:%SZ').date() for i in q])
+    for i in gameDays:
+        KO = max([datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q if datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ').date() == i])
+        FT = KO + timedelta(hours=2)
+        job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronBonus.py',comment='Gameweek Match')
+        job.setall(FT)
+		cron.write()
+    session.close()
+
+def CreateFinalCronjobs():
+    cron = CronTab(user='turner_prize')
+    session=CreateSession()
+    q = session.query(PlFixtures.kickoff_time).all()
+    KO = max([datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q])
+    FT = KO + timedelta(hours=2)
+    job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronFinal.py',comment='Gameweek Match')
+    job.setall(FT)
+    cron.write()
+    session.close()
 
 def DataAvailable():
     PC = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
@@ -81,7 +104,7 @@ def DataAvailable():
         return False
 
 def setupLogger():
-	logger.add('weeklySetupLog.log', format="{time} {level} {message}")
+	logger.add('cronWeekly.log', format="{time} {level} {message}")
 
 def WeeklySetup():
     updateGameweeks()
@@ -106,7 +129,7 @@ if __name__ == "__main__":
 				break
 			else:
 				logger.info('not available, sleeping for 2 minutes')
-				sleep(120)
+				time.sleep(120)
 		except Exception as e:
 			logger.info('Error:')
 			logger.info(e)

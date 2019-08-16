@@ -1,4 +1,0 @@
-2019-08-13T19:45:25.411392+0000 INFO trying to access api
-2019-08-13T19:45:25.577563+0000 INFO success! running weekly setup
-2019-08-13T19:45:25.577849+0000 INFO Error:
-2019-08-13T19:45:25.578018+0000 INFO name 'GetBootstraData' is not defined

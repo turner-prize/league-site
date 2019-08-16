@@ -1,3 +1,4 @@
 /league-site/data/btoken.py
 league-site/data/__pycache__/
 *.save
+.commands.py*.swp
