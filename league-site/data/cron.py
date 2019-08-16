@@ -61,8 +61,20 @@ def getRangeNumber():
 setupLogger()
 
 #If regular game, do until just past full time.
-#if last game of day, do until bonus is added. 
+
+#if last game of day, do untiMl bonus is added. If i[0].day == today(), when time limit is up, check bonus and sleep(600). 
+#r = requests.get("https://fantasy.premierleague.com/api/event-status/")
+#x = r.json()
+#for i in x['status']:
+#	if i['date'] == today:
+#		if i['bonus_added']:
+#
+
 #If last game of week, do until league is updated, and then run 'updateteamsfinalbench' from methods.
+#r = requests.get("https://fantasy.premierleague.com/api/event-status/")
+#x=r.json()
+#if x['leagues'] == 'Updated'
+
 #in both last game of day/week, past full time drop the fetching to every 15 minutes.
 
 for i in range(getRangeNumber()):

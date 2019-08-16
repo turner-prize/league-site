@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import six
 import os
 import telegram
-from token import BotToken
+from btoken import BotToken
 
 def sendMsg(msg):
     chats =     [282457851,

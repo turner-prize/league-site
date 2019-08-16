@@ -3,7 +3,7 @@
 from telegram.ext import Updater,CommandHandler, MessageHandler, BaseFilter, Filters
 import time
 import commands
-from token import BotToken
+from btoken import BotToken
 
 def MessageCheck(Message):
     MyList = ["Dan","Neil","Shed","Matt","Shane","Ads","Tom","Elliott","Crigs","Rholo","Sam"]
