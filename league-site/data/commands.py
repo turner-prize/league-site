@@ -161,6 +161,7 @@ def PlayedDetailed(session,gw,managedId,playerId):
                         .filter(or_(PlFixtures.away_team==Players.team,PlFixtures.home_team==Players.team)) \
                         .filter_by(managerId = managedId) \
                         .filter_by(gameweek = gw) \
+                        .filter(PlFixtures.gameweek == gw) \
                         .filter(Teams.playerId == playerId) \
                         .filter(PlFixtures.finished == 1) \
                         .all())
@@ -172,6 +173,7 @@ def PlayingDetailed(session,gw,managedId,playerId):
                         .filter_by(managerId = managedId) \
                         .filter_by(gameweek = gw) \
                         .filter(Teams.playerId == playerId) \
+                        .filter(PlFixtures.gameweek == gw) \
                         .filter(PlFixtures.started == 1) \
                         .filter(PlFixtures.finished == 0) \
                         .all())
@@ -182,6 +184,7 @@ def StillToPlayDetailed(session,gw,managedId,playerId):
                         .filter(or_(PlFixtures.away_team==Players.team,PlFixtures.home_team==Players.team)) \
                         .filter_by(managerId = managedId) \
                         .filter_by(gameweek = gw) \
+                        .filter(PlFixtures.gameweek == gw) \
                         .filter(Teams.playerId == playerId) \
                         .filter(PlFixtures.started == 0) \
                         .all())
@@ -192,6 +195,7 @@ def Played(session,gw,managedId):
                         .filter(or_(PlFixtures.away_team==Players.team,PlFixtures.home_team==Players.team)) \
                         .filter_by(managerId = managedId) \
                         .filter_by(gameweek = gw) \
+                        .filter(PlFixtures.gameweek == gw) \
                         .filter(PlFixtures.finished == 1) \
                         .filter_by(is_bench=0) \
                         .all())

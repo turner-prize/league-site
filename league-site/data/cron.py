@@ -1,5 +1,5 @@
 from models import CreateSession,PlFixtures,Players
-from methods import updatePlFixtures, updateGameweekPlayers,updateFixturesWithTablePoints,produceTable,createTable
+from methods import updatePlFixtures, updateGameweekPlayers,updateFixturesWithTablePoints,produceTable,createTable,GetGameweek
 import time
 from datetime import datetime, timedelta
 from dateutil import tz
@@ -8,9 +8,11 @@ from loguru import logger
 
 def GetFixtures():
     session=CreateSession()
+    gw = GetGameweek(session)
     q = session.query(PlFixtures.kickoff_time) \
         .distinct(PlFixtures.kickoff_time) \
         .order_by(PlFixtures.kickoff_time) \
+        .filter_by(gameweek=gw) \
         .all()
     dtRanges=[]
     for i in q:
@@ -44,18 +46,18 @@ def LoopIt(rng):
     return rng
 
 def setupLogger():
-        logger.add('cronlog.log', format="{time} {level} {message}")
+        logger.add('/home/turner_prize/leagueolas/league-site/league-site/data/cronlog.log', format="{time:YYYY-MM-DD @ HH:mm:ss} | {message}",backtrace=True)
 
 def getRangeNumber():
     x=GetFixtures()
-    y = min([abs(i[0] - datetime.utcnow()) for i in x])
-    z = {abs(i[0] - datetime.utcnow()):i[0] for i in x}
-
+    MyTime = datetime.utcnow()
+    y = min([abs(i[0] - MyTime) for i in x])
+    z = {abs(i[0] - MyTime):i[0] for i in x}
 
     for i in x:
         if i[0] == z[y]:
             myDifference = i[1] - i[0]
-            timer = myDifference.seconds / 120
+            timer = int(myDifference.seconds / 120)
             
     return timer
 
@@ -78,6 +80,7 @@ def getRangeNumber():
 
 
 setupLogger()
+logger.info('Starting Script')
 for i in range(getRangeNumber()):
     try:
         updatePlFixtures()
@@ -85,8 +88,14 @@ for i in range(getRangeNumber()):
         updateFixturesWithTablePoints()
         produceTable()
         createTable()
+        logger.info('Data Collected, sleeping for 2 mins')
         time.sleep(120)
     except Exception as e:
-        logger.log('Error!')
-        logger.log(e)
-        break
+        logger.info('Error!')
+        print(e)
+        logger.info(e)
+        logger.info('Error Logged, sleeping for 2 mins')
+        time.sleep(120)
+        logger.info('Continuing')
+
+logger.info('log run complete')

@@ -4,10 +4,11 @@ from loguru import logger
 
 
 def setupLogger():
-        logger.add('cronFinal.log', format="{time} {level} {message}")
+        logger.add('/home/turner_prize/leagueolas/league-site/league-site/data/cronFinal.log', format="{time} {level} {message}")
 
 
 setupLogger()
+logger.info('Starting Final Script')
 while True:
     try:
         r = requests.get("https://fantasy.premierleague.com/api/event-status/")

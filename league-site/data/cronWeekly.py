@@ -1,4 +1,4 @@
-from methods import updatePlFixtures, updateGameweekPlayers,updateGameweeks,updateTeams,updatePlPlayers,updateChips,checkDrops,checkReefs
+from methods import getNewPlFixtures, updateGameweekPlayers,updateGameweeks,updateTeams,updatePlPlayers,updateChips,checkDrops,checkReefs
 from models import CreateSession,Gameweeks,PlFixtures
 from dateutil import tz
 import requests
@@ -75,48 +75,58 @@ def CreateBonusCronjobs():
     cron = CronTab(user='turner_prize')
     session=CreateSession()
     q = session.query(PlFixtures.kickoff_time).all()
-    gameDays = set([datetime.strptime(i[0],'%Y-%m-%dT%H:%M:%SZ').date() for i in q])
+    gameDays = set([datetime.datetime.strptime(i[0],'%Y-%m-%dT%H:%M:%SZ').date() for i in q])
     for i in gameDays:
-        KO = max([datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q if datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ').date() == i])
-        FT = KO + timedelta(hours=2)
+        KO = max([datetime.datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q if datetime.datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ').date() == i])
+        FT = KO + datetime.timedelta(hours=2)
         job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronBonus.py',comment='Gameweek Match')
         job.setall(FT)
-		cron.write()
+        cron.write()
     session.close()
 
 def CreateFinalCronjobs():
     cron = CronTab(user='turner_prize')
     session=CreateSession()
     q = session.query(PlFixtures.kickoff_time).all()
-    KO = max([datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q])
-    FT = KO + timedelta(hours=2)
+    KO = max([datetime.datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q])
+    FT = KO + datetime.timedelta(hours=2)
     job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronFinal.py',comment='Gameweek Match')
     job.setall(FT)
     cron.write()
     session.close()
 
 def DataAvailable():
-    PC = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
+    PC = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
     try:
-        PC.json()
-        return True
+        if PC.json():
+            return True
+        else:
+            return False
     except ValueError:
         return False
 
 def setupLogger():
-	logger.add('cronWeekly.log', format="{time} {level} {message}")
+	logger.add('/home/turner_prize/leagueolas/league-site/league-site/data/cronWeekly.log', format="{time} {level} {message}")
 
 def WeeklySetup():
     updateGameweeks()
-    updatePlFixtures
+    logger.info('gameweeks updated')
+    getNewPlFixtures()
+    logger.info('plfixtures updated')
     updatePlPlayers()
+    logger.info('plplayers updated')
     updateTeams()
+    logger.info('Teams updated')
     updateChips()
+    logger.info('chips updated')
     checkDrops()
+    logger.info('drops updated')
     checkReefs()
-    CreateMatchCronJobs()
+    logger.info('reefs updated')
+    CreateMatchCronjobs()
     CreateWeeklyCronjob()
-    
+    CreateBonusCronjobs()
+    CreateFinalCronjobs()    
 
 if __name__ == "__main__":
 	setupLogger()

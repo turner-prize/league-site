@@ -31,7 +31,7 @@ def Scores(bot,update,args):
         bot.send_message(chat_id=update.message.chat_id,text=msg)
 
 def Table(bot,update):
-    bot.send_photo(chat_id=update.message.chat_id, photo=open('table.png', 'rb'))
+    bot.send_photo(chat_id=update.message.chat_id, photo=open('/home/turner_prize/leagueolas/league-site/league-site/data/table.png', 'rb'))
 
 def DraftList(bot, update, args):
     if args:

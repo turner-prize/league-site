@@ -1,21 +1,26 @@
 from methods import updatePlFixtures, updateGameweekPlayers,updateFixturesWithTablePoints,produceTable,createTable
 import time
 from loguru import logger
+import datetime
+import requests
+
 
 
 def setupLogger():
-        logger.add('cronBonus.log', format="{time} {level} {message}")
-
+        logger.add('/home/turner_prize/leagueolas/league-site/league-site/data/cronBonus.log', format="{time:YYYY-MM-DD @ HH:mm:ss} | {message}",backtrace=True)
 
 setupLogger()
-while True:
+logger.info('Starting Bonus Script')
+bonusAdded = False
+while not bonusAdded:
     try:
         r = requests.get("https://fantasy.premierleague.com/api/event-status/")
         x = r.json()
         for i in x['status']:
-            if i['date'] == today:
+            if i['date'] == str(datetime.datetime.now().date()):
                 if i['bonus_added']:
-                    logger.log('bonus added')
+                    bonusAdded = True
+                    logger.info('bonus added')
                     updatePlFixtures()
                     updateGameweekPlayers()
                     updateFixturesWithTablePoints()
@@ -23,9 +28,13 @@ while True:
                     createTable()
                     break
                 else:
-                    logger.log('nothing yet')
+                    logger.info('nothing yet')
                     time.sleep(600)
     except Exception as e:
-        logger.log('Error!')
-        logger.log(e)
-        break
+        logger.info('Error!')
+        logger.info(e)
+        logger.info('Error Logged, sleeping for 10 mins')
+        time.sleep(600)
+        logger.info('Continuing')
+        
+logger.info('Bonus script complete')

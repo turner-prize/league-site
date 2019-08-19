@@ -69,7 +69,7 @@ def createTable():
     df['#'] = df.index +1
     df['#'] = df['#'].apply(lambda x: "{}{}".format(x, (' '*15) ))
     df = df[['#','Team', 'PlayerScore', 'Points']]
-    render_mpl_table(df,'table.png')
+    render_mpl_table(df,'/home/turner_prize/leagueolas/league-site/league-site/data/table.png')
 
 def TripleCaptain(session,managerId,gw):
     TC = session.query(Managers).filter_by(id=managerId).filter_by(TC=gw).first()
@@ -142,6 +142,24 @@ def updateFixturesWithTablePoints():
         session.commit()
     session.close()
 
+def getNewPlFixtures():
+    session=CreateSession()
+    gw = GetGameweek(session)
+    r = requests.get(f"https://fantasy.premierleague.com/api/fixtures/?event={gw}")
+    fixtureData = r.json()
+    for i in fixtureData:
+        print(i['id'])
+        fxtr = PlFixtures(  id = i['id'],
+                            kickoff_time = i['kickoff_time'],
+                            gameweek = i['event'],
+                            away_team = i['team_a'],
+                            home_team = i['team_h'],
+                            started = i['started'],
+                            finished = i['finished'])
+        session.add(fxtr)
+        session.commit()
+    session.close()
+
 def updatePlFixtures():
     session=CreateSession()
     gw = GetGameweek(session)
@@ -193,7 +211,7 @@ def updateGameweekPlayers():
     gw = GetGameweek(session)
     players = session.query(Teams.playerId).filter_by(gameweek=gw).all()
     players = {p[0] for p in players}
-    urls = [f"https://fantasy.premierleague.com/api/element-summary/{i}" for i in players]
+    urls = [f"https://fantasy.premierleague.com/api/element-summary/{i}/" for i in players]
     pool = ThreadPoolExecutor(len(urls))
     futures = [pool.submit(requests.get,url) for url in urls]
     results = [r.result() for r in as_completed(futures)]
@@ -327,7 +345,7 @@ def updateTeams():
                 cap = 1
             else:
                 cap = 0
-            if not BenchBoost(session,m.id,gw):
+            if not BenchBoost(session,i.id,gw):
                 if p['position']> 11:
                     bench = 1
                 else:
@@ -349,7 +367,6 @@ def updateTeams():
 def updateGameweeks():
     bootstrapData = GetBootstrapData()
     gameweekData = bootstrapData['events']
-    
     for i in gameweekData:
         if i['is_current']:
             thisWeek = i['id']
@@ -360,7 +377,6 @@ def updateGameweeks():
     session=CreateSession()
     
     resetGameweeks(session)
-    
     tw = session.query(Gameweeks).filter_by(id=thisWeek).first()
     tw.is_current = 1
     session.add(tw)
@@ -372,7 +388,7 @@ def updateGameweeks():
     session.close()
 
 def GetBootstrapData():
-    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static")
+    r = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
     return r.json()
 
 def GetGameweek(session):
