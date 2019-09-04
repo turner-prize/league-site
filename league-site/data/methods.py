@@ -148,7 +148,6 @@ def getNewPlFixtures():
     r = requests.get(f"https://fantasy.premierleague.com/api/fixtures/?event={gw}")
     fixtureData = r.json()
     for i in fixtureData:
-        print(i['id'])
         fxtr = PlFixtures(  id = i['id'],
                             kickoff_time = i['kickoff_time'],
                             gameweek = i['event'],

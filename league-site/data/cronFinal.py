@@ -1,8 +1,16 @@
 from methods import updatePlFixtures, updateGameweekPlayers,updateFixturesWithTablePoints,produceTable,createTable,updateTeamsFinalBench
+from loguru import logger
+from crontab import CronTab
 import time
 import requests
-from loguru import logger
 
+def clearCronjobs():
+	cron = CronTab(user='turner_prize')
+
+	for job in cron:
+		if job.comment in ['Gameweek Match','Bonus Points','Final Points']:
+			cron.remove(job)
+	cron.write()
 
 def setupLogger():
         logger.add('/home/turner_prize/leagueolas/league-site/league-site/data/cronFinal.log', format="{time} {level} {message}")
@@ -22,6 +30,7 @@ while True:
             updateFixturesWithTablePoints()
             produceTable()
             createTable()
+            clearCronjobs()
             break
         else:
             logger.info('nothing yet')

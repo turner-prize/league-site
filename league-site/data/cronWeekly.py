@@ -8,11 +8,17 @@ from crontab import CronTab
 from collections import namedtuple
 from loguru import logger
 
+def GetGameweek(session):
+    gw = session.query(Gameweeks.id).filter_by(is_current=1).first()
+    return gw[0]
+
 def getKickoffTimes():
     session=CreateSession()
+    gw=GetGameweek(session)
     q = session.query(PlFixtures.kickoff_time) \
             .distinct(PlFixtures.kickoff_time) \
             .order_by(PlFixtures.kickoff_time) \
+            .filter_by(gameweek=gw) \
             .all()
     dtRanges=[]
     for i in q:
@@ -74,12 +80,13 @@ def CreateMatchCronjobs():
 def CreateBonusCronjobs():
     cron = CronTab(user='turner_prize')
     session=CreateSession()
-    q = session.query(PlFixtures.kickoff_time).all()
+    gw=GetGameweek(session)
+    q = session.query(PlFixtures.kickoff_time).filter_by(gameweek=gw).all()
     gameDays = set([datetime.datetime.strptime(i[0],'%Y-%m-%dT%H:%M:%SZ').date() for i in q])
     for i in gameDays:
         KO = max([datetime.datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q if datetime.datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ').date() == i])
         FT = KO + datetime.timedelta(hours=2)
-        job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronBonus.py',comment='Gameweek Match')
+        job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronBonus.py',comment='Bonus Points')
         job.setall(FT)
         cron.write()
     session.close()
@@ -87,21 +94,22 @@ def CreateBonusCronjobs():
 def CreateFinalCronjobs():
     cron = CronTab(user='turner_prize')
     session=CreateSession()
-    q = session.query(PlFixtures.kickoff_time).all()
+    gw=GetGameweek(session)
+    q = session.query(PlFixtures.kickoff_time).filter_by(gameweek=gw).all()
     KO = max([datetime.datetime.strptime(j[0],'%Y-%m-%dT%H:%M:%SZ') for j in q])
     FT = KO + datetime.timedelta(hours=2)
-    job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronFinal.py',comment='Gameweek Match')
+    job  = cron.new(command='/home/turner_prize/leagueolas/bot-env/bin/python3 /home/turner_prize/leagueolas/league-site/league-site/data/cronFinal.py',comment='Final Points')
     job.setall(FT)
     cron.write()
     session.close()
 
 def DataAvailable():
-    PC = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
+    PC = requests.get("https://fantasy.premierleague.com/api/event-status/")
     try:
-        if PC.json():
-            return True
-        else:
+        if PC.json() == "The game is being updated.":
             return False
+        else:
+            return True
     except ValueError:
         return False
 
@@ -129,19 +137,21 @@ def WeeklySetup():
     CreateFinalCronjobs()    
 
 if __name__ == "__main__":
-	setupLogger()
-	while True:
-		try:
-			logger.info('trying to access api')
-			if DataAvailable():
-				logger.info('success! running weekly setup')
-				WeeklySetup()
-				break
-			else:
-				logger.info('not available, sleeping for 2 minutes')
-				time.sleep(120)
-		except Exception as e:
-			logger.info('Error:')
-			logger.info(e)
-			break
+    setupLogger()
+    logger.info('sleeping for 5 minutes to not fuck things up')
+    time.sleep(300)
+    while True:
+        try:
+            logger.info('trying to access api')
+            if DataAvailable():
+                logger.info('success! running weekly setup')
+                WeeklySetup()
+                break
+            else:
+                logger.info('not available, sleeping for 2 minutes')
+                time.sleep(120)
+        except Exception as e:
+            logger.info('Error:')
+            logger.info(e)
+            break
 	
