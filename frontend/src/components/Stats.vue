@@ -16,6 +16,7 @@
     data () {
       return {
         datacollection: {},
+        labells:[],
         options:{
           legend: { display: true },
           title: {
@@ -48,8 +49,8 @@
       }
     },
     created() {
-      axios.get("http://127.0.0.1:5000/tablehistory")
-          .then(res => this.datacollection = res.data)
+      axios.get("http://localhost:3000/api/tablehistory")
+          .then(res => this.datacollection['labels'] = res.data.map(c=>c.teamname))
           .catch(err => console.log(err));
     },
   }

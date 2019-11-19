@@ -1,0 +1,121 @@
+swagger: "2.0"
+info:
+  description: This is the swagger file that goes with our server code
+  version: "1.0.0"
+  title: Swagger Rest Article
+consumes:
+  - application/json
+produces:
+  - application/json
+
+basePath: /api
+
+# Paths supported by the server application
+paths:
+  /draftedplayers:
+    get:
+      operationId: league.getDrafted
+      tags:
+        - League
+        - Draft
+        - Players
+      summary: Read the entire set of currently drafted players
+      description: Read the entire set of currently drafted players
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: string
+                managerid:
+                  type: string
+                playerid:
+                  type: string
+  /fixtures:
+    get:
+      operationId: league.getFixtures
+      tags:
+        - League
+        - Fixtures
+        - Managers
+      summary: Read the entire set of fixtures for the season, included played games and scores
+      description: Read the entire set of fixtures for the season, included played games and scores
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: string
+                gameweek:
+                  type: string
+                managerid:
+                  type: string
+                opponentid:
+                  type: string
+                points:
+                  type: string
+                score:
+                  type: string
+                  
+  /tablehistory:
+    get:
+      operationId: league.getTableHistory
+      tags:
+        - League
+        - Fixtures
+        - Managers
+      summary: Read the entire set of fixtures for the season, included played games and scores
+      description: Read the entire set of fixtures for the season, included played games and scores
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: string
+                gameweek:
+                  type: string
+                managerid:
+                  type: string
+                position:
+                  type: string
+                teamname:
+                  type: string            
+                  
+#Ignore below, just a test for formatting queries to be consumable via API              
+  /fixturesreadable:
+    get:
+      operationId: league.getfixturesReadable
+      tags:
+        - League
+        - Fixtures
+        - Managers
+      summary: Read the entire set of fixtures for the season, included played games and scores
+      description: Read the entire set of fixtures for the season, included played games and scores
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: string
+                gameweek:
+                  type: string
+                managerid:
+                  type: string
+                opponentid:
+                  type: string
+                points:
+                  type: string
+                score:
+                  type: string
