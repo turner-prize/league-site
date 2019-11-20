@@ -12,15 +12,15 @@ basePath: /api
 
 # Paths supported by the server application
 paths:
-  /draftedplayers:
+   /draftboard:
     get:
-      operationId: league.getDrafted
+      operationId: league.getDraftBoard
       tags:
         - League
         - Draft
         - Players
-      summary: Read the entire set of currently drafted players
-      description: Read the entire set of currently drafted players
+      summary: Read the entire set of currently drafted players, used for population of the Draftboard on the website
+      description: Read the entire set of currently drafted players, who drafted them and the order of the Draft
       responses:
         200:
           description: Successfully set operation
@@ -29,12 +29,45 @@ paths:
             items:
               properties:
                 id:
-                  type: string
+                  type: integer
                 managerid:
+                  type: integer
+                GK:
                   type: string
+                DF1:
+                  type: string
+                DF2:
+                  type: string
+                MF1:
+                  type: string                  
+                MF2:
+                  type: string
+                FWD:
+                  type: string                  
+
+   /draftedplayers:
+    get:
+      operationId: league.getDraftedPlayers
+      tags:
+        - League
+        - Draft
+        - Players
+      summary: Read the entire set of currently drafted players
+      description: Read the entire set of currently drafted players, used by the bot to return who has which players, and who is available.
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: integer
+                managerid:
+                  type: integer
                 playerid:
-                  type: string
-  /fixtures:
+                  type: integer
+   /fixtures:
     get:
       operationId: league.getFixtures
       tags:
@@ -51,19 +84,158 @@ paths:
             items:
               properties:
                 id:
-                  type: string
+                  type: integer
                 gameweek:
-                  type: string
+                  type: integer
                 managerid:
-                  type: string
+                  type: integer
                 opponentid:
-                  type: string
+                  type: integer
                 points:
-                  type: string
+                  type: integer
                 score:
+                  type: integer
+
+   /gameweeks:
+    get:
+      operationId: league.getGameweeks
+      tags:
+        - League
+        - Fixtures
+      summary: Get details of all gameweeks throughout the season, and the current gameweek
+      description: Get details of all gameweeks throughout the season, and the current gameweek
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: integer
+                name:
                   type: string
-                  
-  /tablehistory:
+                deadline:
+                  type: string
+                is_current:
+                  type: integer
+                is_next:
+                  type: integer    
+
+   /managers:
+    get:
+      operationId: league.getManagers
+      tags:
+        - League
+        - Managers
+      summary: Get details of all mangers in the league, including teamname and FPL id
+      description: Get details of all mangers in the league, including teamname and FPL id
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: integer
+                telegramid:
+                  type: integer
+                fplid:
+                  type: integer
+                name:
+                  type: string
+                teamname:
+                  type: string   
+                draftpick:
+                  type: integer 
+                tc:
+                  type: integer                   
+                bb:
+                  type: integer                   
+                fh:
+                  type: integer            
+                wc1:
+                  type: integer                              
+                wc2:
+                  type: integer                              
+                colour:
+                  type: string        
+                             
+
+   /plteams:
+    get:
+      operationId: league.getPLTeams
+      tags:
+        - League
+        - Managers
+      summary: Get details of all mangers in the league, including teamname and FPL id
+      description: Get details of all mangers in the league, including teamname and FPL id
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+                shortname:
+                  type: string
+
+   /players:
+    get:
+      operationId: league.getPlayers
+      tags:
+        - League
+        - Managers
+      summary: Get details of all mangers in the league, including teamname and FPL id
+      description: Get details of all mangers in the league, including teamname and FPL id
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                jfpl:
+                  type: integer
+                event_points:
+                  type: integer
+                first_name:
+                  type: string
+                second_name:
+                  type: string
+                team:
+                  type: integer
+                team_code:
+                  type: integer
+                goals_scored:
+                  type: integer
+                assists:
+                  type: integer
+                goals_conceded:
+                  type: integer
+                pen_save:
+                  type: integer
+                pen_missed:
+                  type: integer
+                yellow_cards:
+                  type: integer
+                red_cards:
+                  type: integer
+                saves:
+                  type: integer
+                element_type:
+                  type: integer
+                web_name:
+                  type: string
+
+
+
+   /tablehistory:
     get:
       operationId: league.getTableHistory
       tags:
@@ -80,18 +252,51 @@ paths:
             items:
               properties:
                 id:
-                  type: string
+                  type: integer
                 gameweek:
-                  type: string
+                  type: integer
                 managerid:
-                  type: string
+                  type: integer
                 position:
-                  type: string
+                  type: integer
                 teamname:
                   type: string            
-                  
+
+   /teams:
+    get:
+      operationId: league.getTeams
+      tags:
+        - League
+        - Fixtures
+        - Managers
+      summary: Read the entire set of fixtures for the season, included played games and scores
+      description: Read the entire set of fixtures for the season, included played games and scores
+      responses:
+        200:
+          description: Successfully set operation
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: integer
+                gameweek:
+                  type: integer
+                managerid:
+                  type: integer
+                playerid:
+                  type: integer
+                points:
+                  type: integer
+                is_captain:
+                  type: integer
+                is_bench:
+                  type: integer
+                reefed:
+                  type: integer
+
 #Ignore below, just a test for formatting queries to be consumable via API              
-  /fixturesreadable:
+   /fixturesreadable:
     get:
       operationId: league.getfixturesReadable
       tags:

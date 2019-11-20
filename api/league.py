@@ -1,20 +1,62 @@
 from config import db
-from models import DraftedPlayers, Fixtures, Managers, FixturesReadable, TableHistory, TH
-from schemas import DraftedPlayersSchema,FixturesSchema, ManagersSchema, FixturesReadableSchema, TableHistorySchema, THSchema
+from models import DraftBoard,DraftedPlayers,Fixtures,Gameweeks,Managers,PLFixtures,PLTeams,Players,Table,TableHistory,Teams
+from models import TH,FixturesReadable
+from schemas import DraftBoardSchema,DraftedPlayersSchema,FixturesSchema,GameweeksSchema, ManagersSchema,PLFixturesSchema,PLTeamsSchema,PlayersSchema,TableSchema,TableHistorySchema,TeamsSchema
+from schemas import FixturesReadableSchema,THSchema
 from sqlalchemy.orm import aliased
 from datetime import date
 import json
 
-def getDrafted():
+def getDraftBoard():
+    d = DraftBoard.query.all()
+    this_schema = DraftBoardSchema(many=True)
+    return this_schema.dump(d).data
+
+def getDraftedPlayers():
     d = DraftedPlayers.query.all()
-    draftedplayers_schema = DraftedPlayersSchema(many=True)
-    return draftedplayers_schema.dump(d).data
+    this_schema = DraftedPlayersSchema(many=True)
+    return this_schema.dump(d).data
     
 def getFixtures():
-    f = Fixtures.query.all()
-    fixtures_schema = FixturesSchema(many=True)    
-    return fixtures_schema.dump(f).data
+    d = Fixtures.query.all()
+    this_schema = FixturesSchema(many=True)
+    return this_schema.dump(d).data
     
+def getGameweeks():
+    d = Gameweeks.query.all()
+    this_schema = GameweeksSchema(many=True)
+    return this_schema.dump(d).data
+
+def getManagers():
+    d = Managers.query.all()
+    this_schema = ManagersSchema(many=True)
+    return this_schema.dump(d).data
+
+def getPLFixtures():
+    d = PLFixtures.query.all()
+    this_schema = PLFixturesSchema(many=True)
+    return this_schema.dump(d).data
+
+def getPLTeams():
+    d = PLTeams.query.all()
+    this_schema = PLTeamsSchema(many=True)
+    return this_schema.dump(d).data
+
+def getPlayers():
+    d = Players.query.all()
+    this_schema = PlayersSchema(many=True)
+    return this_schema.dump(d).data
+
+def getTable():
+    d = Table.query.all()
+    this_schema = TableSchema(many=True)
+    return this_schema.dump(d).data
+
+def getTeams():
+    d = Teams.query.all()
+    this_schema = TeamsSchema(many=True)
+    return this_schema.dump(d).data
+   
 def getTableHistory():
     tn = [i.teamname for i in db.session.query(Managers.teamname).all()]
     xgw = 0
