@@ -1,5 +1,6 @@
 <template>
-  <div id="statsView">    <Stats />
+  <div id="statsView">    
+    <Stats />
   </div>
 </template>
 
@@ -21,6 +22,10 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 40px;
 }
+  #statsView{
+    display:flex;
+    justify-content:space-around;
+  }
 </style>

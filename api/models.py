@@ -29,6 +29,7 @@ class Managers(db.Model):
     fh = db.Column(db.Integer)
     wc1 = db.Column(db.Integer)
     wc2 = db.Column(db.Integer)
+    colour = db.Column(db.String)
     
 class TableHistory(db.Model):
     __tablename__ = 'tableHistory'

@@ -1,7 +1,7 @@
 
 <template>
   <div class="small">
-    <line-chart :chart-data="datacollection" :options="options"></line-chart>
+    <line-chart :chart-data="data" :options="options" :width="1500" :height="700"></line-chart>
   </div>
 </template>
 
@@ -15,8 +15,7 @@
     },
     data () {
       return {
-        datacollection: {},
-        labells:[],
+        data: {},
         options:{
           legend: { display: true },
           title: {
@@ -50,15 +49,11 @@
     },
     created() {
       axios.get("http://localhost:3000/api/tablehistory")
-          .then(res => this.datacollection['labels'] = res.data.map(c=>c.teamname))
+          .then(res => this.data = res.data['data'])
           .catch(err => console.log(err));
     },
   }
 </script>
 
-<style>
-  .small {
-    max-width: 600px;
-    margin:  150px auto;
-  }
+<style scoped>
 </style>

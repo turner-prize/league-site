@@ -3,6 +3,7 @@ from models import DraftedPlayers, Fixtures, Managers, FixturesReadable, TableHi
 from schemas import DraftedPlayersSchema,FixturesSchema, ManagersSchema, FixturesReadableSchema, TableHistorySchema, THSchema
 from sqlalchemy.orm import aliased
 from datetime import date
+import json
 
 def getDrafted():
     d = DraftedPlayers.query.all()
@@ -15,14 +16,47 @@ def getFixtures():
     return fixtures_schema.dump(f).data
     
 def getTableHistory():
-    th = TableHistory.query.join(Managers, Managers.id==TableHistory.manager) \
-                                .add_columns(   TableHistory.id,
-                                                TableHistory.position,
-                                                TableHistory.gameweek,
-                                                Managers.teamname) \
-                                .all()
-    th_schema = THSchema(many=True)    
-    return th_schema.dump(th).data
+    tn = [i.teamname for i in db.session.query(Managers.teamname).all()]
+    xgw = 0
+    allDatasets = []
+    
+    for teamname in tn:
+    
+        x = db.session.query(TableHistory).join(Managers, Managers.id==TableHistory.manager) \
+                                          .add_columns(   TableHistory.id,
+                                                    TableHistory.position,
+                                                    TableHistory.gameweek,
+                                                    Managers.teamname) \
+                                          .filter(Managers.teamname == teamname) \
+                                    .all()
+        thisDataset = []
+        for i in x:
+            thisDatapoint = {}
+            gw = i.gameweek
+            pos = i.position
+            if gw > xgw:
+                xgw = gw
+            thisDatapoint['x'] = gw
+            thisDatapoint['y'] = pos
+            thisDataset.append(thisDatapoint)
+        fin = {
+               'label':teamname,
+               'data':thisDataset,
+               'borderColor': db.session.query(Managers.colour).filter(Managers.teamname == teamname).first(),
+               'backgroundColor': db.session.query(Managers.colour).filter(Managers.teamname == teamname).first(),
+               'fill':False
+               }
+        allDatasets.append(fin)
+    labels = [i for i in range(1,xgw +1)]
+    
+    finalproduct = {'data': {
+                              'labels':labels,
+                              'datasets': allDatasets
+                              }
+                    }
+    
+    return finalproduct
+   
 
 #Ignore below, just a test for formatting queries to be consumable via API
 def getfixturesReadable():
