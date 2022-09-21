@@ -21,7 +21,7 @@
     "vue-search-select": "^2.8.3",
     "vue-select": "^3.1.0",
     "vue-sidebar-menu": "^3.12.2",
-    "vuetify": "^2.0.1"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
